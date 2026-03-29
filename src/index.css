@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 39% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 39% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 39% 11%;
+    --primary: 215 96% 19%; /* #02285E */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 25 98% 50%; /* #FC6C03 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 8% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 39% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 25 98% 50%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 220 39% 11%;
+    --foreground: 0 0% 98%;
+    --card: 220 39% 11%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 39% 11%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 215 96% 19%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 25 98% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 25 98% 50%;
+  }
+}
+
+@theme {
+  --color-brand-blue: #02285E;
+  --color-brand-blue-light: #0149AF;
+  --color-brand-orange: #FC6C03;
+  --color-brand-orange-light: #FD9E58;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .mesh-gradient {
+    background-color: #02285E;
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(215, 96%, 19%, 1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(215, 96%, 30%, 1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(25, 98%, 50%, 0.15) 0, transparent 50%);
+  }
+  
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Scroll Animations & Utilities */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+.animate-pulse-glow { animation: pulse-glow 3s infinite ease-in-out; }
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.animate-shake {
+  animation: shake 0.2s ease-in-out 0s 2;
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a1a1aa'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Hide Scrollbar for sleekness */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }

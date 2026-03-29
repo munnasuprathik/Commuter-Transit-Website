@@ -1,0 +1,23 @@
+{
+  "short_name": "Commuter Transit",
+  "name": "Commuter Transit | Accessible Transport, Charters & Removals Melbourne",
+  "description": "Melbourne's reliable provider for wheelchair-accessible transport, corporate event shuttles, civil project crew buses, and professional removals.",
+  "icons": [
+    {
+      "src": "/images/CT WATERMARK.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/CT WATERMARK.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#050505",
+  "background_color": "#050505",
+  "lang": "en-AU",
+  "categories": ["transportation", "travel", "business"]
+}
