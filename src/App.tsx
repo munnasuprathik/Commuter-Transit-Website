@@ -3,17 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useState, FormEvent } from 'react';
+import React, { useEffect, useRef, useState, FormEvent } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import Fuse from 'fuse.js';
 import './types.d.ts';
-import { TestimonialsSection } from './components/blocks/testimonials';
+import { FleetSection } from './components/blocks/fleet';
 import { Footer } from './components/blocks/footer';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { NotFound } from './pages/NotFound';
+import { ServicePage } from './pages/services/ServicePage';
 import { Toaster, toast } from 'sonner';
 
 import { Typewriter } from './components/ui/typewriter';
@@ -44,12 +45,8 @@ function Home() {
   const [toSuggestions, setToSuggestions] = useState<string[]>([]);
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [headerTheme, setHeaderTheme] = useState<'light' | 'dark'>('light');
-  const { scrollYProgress } = useScroll();
-  const textY = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
-  const imageY = useTransform(scrollYProgress, [0, 0.2], [0, 50]);
 
   const melbourneLocations = [
     'Melbourne Airport (MEL)',
@@ -93,14 +90,13 @@ function Home() {
   });
 
   const servicesAvailability: Record<string, boolean> = {
-    'vehicle-hire': true,
+    'chauffeur': true,
     'accessible': true,
+    'airport': true,
     'corporate': true,
-    'tour': true,
-    'school': true,
-    'disruption': false,
-    'removal': false,
-    'civil': true
+    'logistics': true,
+    'disruption': true,
+    'vehicle-hire': true
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -232,7 +228,15 @@ function Home() {
         setSubmitStatus('success');
         setBookingStep(1);
 
-        toast.success(activeTab === 'booking' ? 'Booking request sent successfully!' : 'Message sent successfully!');
+        toast.success(
+          activeTab === 'booking' ? 'Booking confirmed' : 'Message received',
+          {
+            description: activeTab === 'booking'
+              ? `Reference ${reference}. Our team will contact you shortly.`
+              : 'A team member will respond within 24 hours.',
+            duration: 6000,
+          }
+        );
 
         setFormData({
           fullName: '',
@@ -249,11 +253,24 @@ function Home() {
       } catch (error) {
         console.error('Error submitting booking:', error);
         setSubmitStatus('error');
-        toast.error('Failed to submit request. Please try again.');
+        toast.error('Submission failed', {
+          description: 'Please check your connection and try again, or call 0411 099 994.',
+          duration: 7000,
+          action: {
+            label: 'Call us',
+            onClick: () => { window.location.href = 'tel:0411099994'; },
+          },
+        });
       }
     } else {
+      const count = Object.keys(newErrors).length;
+      toast.error(`${count} field${count > 1 ? 's' : ''} need attention`, {
+        description: 'Highlighted fields below require correction.',
+        duration: 4000,
+      });
       const firstErrorId = Object.keys(newErrors)[0];
       document.getElementById(firstErrorId)?.focus();
+      document.getElementById(firstErrorId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
@@ -281,11 +298,13 @@ function Home() {
       }
     };
 
+    let scrollRaf = 0;
     const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (window.scrollY / totalHeight) * 100;
-      setScrollProgress(progress);
-      setIsScrolled(window.scrollY > 50);
+      if (scrollRaf) return;
+      scrollRaf = window.requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 50);
+        scrollRaf = 0;
+      });
     };
 
     // Header Theme Observer
@@ -307,11 +326,12 @@ function Home() {
 
     sections.forEach((section) => observer.observe(section));
     document.addEventListener('click', handleAnchorClick);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       document.removeEventListener('click', handleAnchorClick);
       window.removeEventListener('scroll', handleScroll);
+      if (scrollRaf) window.cancelAnimationFrame(scrollRaf);
       observer.disconnect();
     };
   }, []);
@@ -323,16 +343,11 @@ function Home() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isScrolled
+        className={`absolute top-0 inset-x-0 z-50 transition-[padding] duration-300 ${isScrolled
           ? 'py-4 px-4 md:px-8'
           : 'p-4 md:p-8'
           } flex justify-between items-center pointer-events-none`}
       >
-        {/* Scroll Progress Bar */}
-        <motion.div
-          className="absolute top-0 left-0 h-0.5 bg-white origin-left z-[60]"
-          style={{ width: `${scrollProgress}%` }}
-        />
 
         {/* Left: Logo */}
         <motion.a
@@ -341,11 +356,11 @@ function Home() {
           whileTap={{ scale: 0.98 }}
           className="pointer-events-auto group flex items-center justify-center transition-all duration-500"
         >
-          <div className="h-14 md:h-18 flex items-center justify-center">
+          <div className="h-20 md:h-28 flex items-center justify-center">
             <img
               src={headerTheme === 'dark' ? "/images/CT LOGO WHITE.png" : "/images/CT LOGO.png"}
               alt="Commuter Transit Logo"
-              className={`h-full w-auto object-contain transition-all duration-500 ${headerTheme === 'light' ? 'drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)]' : 'drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]'}`}
+              className="h-full w-auto object-contain transition-all duration-500"
             />
           </div>
         </motion.a>
@@ -355,18 +370,24 @@ function Home() {
             ? 'bg-black/20 border-white/10'
             : 'bg-zinc-100/80 border-black/5'
           }`}>
-          {['About', 'Services', 'Standards', 'Clients'].map((item, idx) => (
+          {[
+            { label: 'Services', href: '#services' },
+            { label: 'Fleet', href: '#fleet' },
+            { label: 'Corporate', href: '#corporate' },
+            { label: 'Compliance', href: '#standards' },
+            { label: 'Contact', href: '#contact' },
+          ].map((item, idx) => (
             <motion.a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              onMouseEnter={() => setHoveredNav(item)}
+              key={item.label}
+              href={item.href}
+              onMouseEnter={() => setHoveredNav(item.label)}
               onMouseLeave={() => setHoveredNav(null)}
               whileHover={{ y: -1 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
               className={`relative px-6 py-2.5 text-[10px] font-bold transition-all duration-300 tracking-[0.2em] uppercase ${headerTheme === 'dark' ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-brand-blue'
                 }`}
             >
-              {hoveredNav === item && (
+              {hoveredNav === item.label && (
                 <motion.div
                   layoutId="nav-pill"
                   className={`absolute inset-0 rounded-full ${headerTheme === 'dark' ? 'bg-white/10' : 'bg-brand-blue/5'
@@ -374,7 +395,7 @@ function Home() {
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-              <span className="relative z-10">{item}</span>
+              <span className="relative z-10">{item.label}</span>
             </motion.a>
           ))}
         </nav>
@@ -385,7 +406,7 @@ function Home() {
               ? 'bg-black/20 border-white/10'
               : 'bg-zinc-100/80 border-black/5'
             }`}>
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
             <span className={`text-[9px] font-bold uppercase tracking-[0.2em] transition-colors duration-500 ${headerTheme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>Available 24/7</span>
           </div>
           <a href="#contact" className={`hidden md:flex group items-center gap-2 backdrop-blur-xl border px-8 py-3 rounded-full transition-all duration-500 shadow-lg ${headerTheme === 'dark'
@@ -417,20 +438,26 @@ function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-brand-blue/95 backdrop-blur-3xl pt-24 px-6 pb-6 flex flex-col"
+            className="fixed inset-0 z-40 bg-brand-blue pt-24 px-6 pb-6 flex flex-col"
           >
             <nav className="flex flex-col gap-8 text-center mt-12">
-              {['About', 'Services', 'Standards', 'Clients'].map((item, idx) => (
+              {[
+                { label: 'Services', href: '#services' },
+                { label: 'Fleet', href: '#fleet' },
+                { label: 'Corporate', href: '#corporate' },
+                { label: 'Compliance', href: '#standards' },
+                { label: 'Contact', href: '#contact' },
+              ].map((item, idx) => (
                 <motion.a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
+                  key={item.label}
+                  href={item.href}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * idx, duration: 0.5 }}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="text-3xl font-medium text-zinc-300 hover:text-white transition-colors tracking-widest uppercase"
                 >
-                  {item}
+                  {item.label}
                 </motion.a>
               ))}
               <motion.a
@@ -450,7 +477,7 @@ function Home() {
       </AnimatePresence>
 
       {/* Hero Section - Modern Minimalist */}
-      <section id="hero" data-header-theme="dark" className="relative min-h-[100svh] flex items-center bg-brand-blue overflow-hidden pt-24 md:pt-32">
+      <section id="hero" data-header-theme="dark" className="relative min-h-[100svh] flex items-center bg-brand-blue overflow-hidden pt-28 md:pt-36 pb-20 md:pb-28">
         {/* Minimalist Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-brand-blue-light/20 to-transparent pointer-events-none"></div>
 
@@ -459,7 +486,6 @@ function Home() {
 
             {/* Typography Focus */}
             <motion.div
-              style={{ y: textY }}
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -476,11 +502,11 @@ function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-medium leading-[1.05] tracking-tight text-white mb-6 md:mb-8"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] font-medium leading-[1.1] tracking-tight text-white mb-6 md:mb-8"
               >
-                <TextReveal>Accessible</TextReveal>
-                <TextReveal delay={0.1}><span className="text-zinc-500">Transport &</span></TextReveal>
-                <TextReveal delay={0.2}>Charters.</TextReveal>
+                <TextReveal>Specialist Transport</TextReveal>
+                <TextReveal delay={0.1}><span className="text-zinc-500">& Mobility Solutions</span></TextReveal>
+                <TextReveal delay={0.2}>Across Australia.</TextReveal>
               </motion.h1>
 
               <motion.p
@@ -489,7 +515,7 @@ function Home() {
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="text-zinc-400 font-light leading-relaxed max-w-md text-base sm:text-lg md:text-xl mb-8 md:mb-12"
               >
-                Melbourne's reliable provider for transport work, corporate event shuttles, civil project crew buses, and professional logistics.
+                Premium chauffeur services, wheelchair accessible transport, airport transfers, corporate mobility, logistics transport, rail replacement services and fleet hire — trusted by individuals, businesses and infrastructure partners across Australia.
               </motion.p>
 
               <motion.div
@@ -498,31 +524,84 @@ function Home() {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6"
               >
-                <MagneticButton href="#contact" className="px-8 py-4 bg-gradient-to-r from-brand-orange to-[#ff8c33] shadow-[inset_0_1px_rgba(255,255,255,0.3),0_4px_20px_rgba(252,108,3,0.3)] text-white text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] rounded-full hover:shadow-[0_8px_32px_rgba(252,108,3,0.6)] transition-all duration-500 text-center">
+                <MagneticButton href="#contact" onClick={() => setActiveTab('booking')} className="px-10 py-4 bg-brand-orange text-white text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] rounded-full hover:bg-brand-orange-light transition-colors duration-500 text-center">
                   Book Transport
                 </MagneticButton>
-                <MagneticButton href="#services" className="px-8 py-4 bg-transparent text-white border border-white/20 text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] rounded-full hover:bg-white/5 hover:border-white/40 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] transition-all duration-500 text-center">
-                  Explore Services
+                <MagneticButton href="#contact" onClick={() => setActiveTab('contact')} className="px-10 py-4 bg-transparent text-white border border-white/25 text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] rounded-full hover:bg-white hover:text-brand-blue hover:border-white transition-all duration-500 text-center">
+                  Request Corporate Quote
                 </MagneticButton>
               </motion.div>
 
-              {/* Mobile Quick Nav */}
+              {/* Hero Booking Widget */}
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                className="mt-12 flex md:hidden flex-wrap gap-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                className="mt-10 md:mt-14 max-w-2xl"
               >
-                {['About', 'Services', 'Standards', 'Clients'].map((item) => (
-                  <a
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] hover:bg-white/10 transition-colors"
+                <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-2 sm:p-2.5 flex flex-col sm:flex-row gap-2 sm:items-center">
+                  <input
+                    type="text"
+                    name="fromLocation"
+                    aria-label="Pickup location"
+                    value={formData.fromLocation}
+                    onChange={handleInputChange}
+                    placeholder="Pickup"
+                    className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none"
+                  />
+                  <span aria-hidden="true" className="hidden sm:block w-px h-6 bg-white/10"></span>
+                  <input
+                    type="text"
+                    name="toLocation"
+                    aria-label="Destination"
+                    value={formData.toLocation}
+                    onChange={handleInputChange}
+                    placeholder="Destination"
+                    className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none"
+                  />
+                  <span aria-hidden="true" className="hidden sm:block w-px h-6 bg-white/10"></span>
+                  <select
+                    name="service"
+                    aria-label="Service type"
+                    value={formData.service}
+                    onChange={handleInputChange}
+                    className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white focus:outline-none cursor-pointer [&>option]:bg-brand-blue"
                   >
-                    {item}
-                  </a>
-                ))}
+                    <option value="">Service type</option>
+                    <option value="chauffeur">Chauffeur Services</option>
+                    <option value="accessible">Wheelchair Accessible</option>
+                    <option value="airport">Airport Transfers</option>
+                    <option value="corporate">Event &amp; Corporate</option>
+                    <option value="logistics">Logistics</option>
+                    <option value="disruption">Public Disruption</option>
+                    <option value="vehicle-hire">Vehicle Hire</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('booking');
+                      setBookingStep(1);
+                      const target = document.getElementById('contact');
+                      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      window.setTimeout(() => {
+                        const focusId = !formData.fromLocation.trim()
+                          ? 'fromLocation'
+                          : !formData.toLocation.trim()
+                            ? 'toLocation'
+                            : 'fromLocation';
+                        const el = document.getElementById(focusId) as HTMLInputElement | null;
+                        if (el) el.focus({ preventScroll: true });
+                      }, 600);
+                    }}
+                    className="shrink-0 bg-brand-orange hover:bg-brand-orange-light text-white px-6 py-3 rounded-xl text-[11px] font-medium uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2"
+                  >
+                    Get Quote
+                    <iconify-icon icon="solar:arrow-right-linear" width="14"></iconify-icon>
+                  </button>
+                </div>
               </motion.div>
+
+
             </motion.div>
 
             {/* Striking Visual Element */}
@@ -532,15 +611,12 @@ function Home() {
               transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-6 relative h-[40vh] sm:h-[50vh] lg:h-[80vh] w-full rounded-2xl md:rounded-3xl overflow-hidden order-1 lg:order-2 group shadow-2xl"
             >
-              <motion.img
+              <img
                 src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=2017&auto=format&fit=crop"
                 alt="Commuter Transit vehicle for accessible and corporate transport in Melbourne"
-                initial={{ scale: 1.1 }}
-                whileHover={{ scale: 1 }}
-                transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-[1.5s]"
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-blue via-transparent to-transparent lg:hidden"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-blue/80 via-brand-blue/10 to-transparent"></div>
 
               {/* Minimalist Floating Badge */}
               <motion.div
@@ -550,7 +626,7 @@ function Home() {
                 className="absolute bottom-4 right-4 md:bottom-8 md:right-8 bg-black/40 backdrop-blur-2xl border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
               >
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 animate-pulse drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div>
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 animate-pulse"></div>
                   <p className="text-white text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">Operating 24/7</p>
                 </div>
                 <p className="text-zinc-400 text-[8px] sm:text-[9px] md:text-[10px] mt-1 md:mt-2 uppercase tracking-widest pl-3 sm:pl-4 md:pl-6">Melbourne & Interstate</p>
@@ -560,36 +636,37 @@ function Home() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-4 hidden lg:flex"
-        >
-          <span className="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em] [writing-mode:vertical-lr] rotate-180">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-white/30 to-transparent"></div>
-        </motion.div>
+        {/* Layered curved transition — hero → about */}
+        <div className="absolute -bottom-px left-0 right-0 pointer-events-none z-20" aria-hidden="true">
+          {/* Back layer — subtle depth wave */}
+          <svg
+            viewBox="0 0 1440 160"
+            preserveAspectRatio="none"
+            className="absolute bottom-0 left-0 right-0 w-full h-[90px] sm:h-[120px] md:h-[170px] block"
+          >
+            <path
+              d="M0,80 C200,140 420,160 720,120 C1020,80 1240,40 1440,90 L1440,161 L0,161 Z"
+              fill="#0149AF"
+              opacity="0.35"
+            />
+          </svg>
+          {/* Front layer — final fafafa curve */}
+          <svg
+            viewBox="0 0 1440 130"
+            preserveAspectRatio="none"
+            className="relative w-full h-[80px] sm:h-[110px] md:h-[150px] block"
+          >
+            <path
+              d="M0,30 C260,130 500,150 760,110 C1020,70 1240,40 1440,95 L1440,131 L0,131 Z"
+              fill="#fafafa"
+            />
+          </svg>
+        </div>
       </section>
 
-      {/* Section Divider Marquee */}
-      <div className="bg-brand-blue py-8 sm:py-12 overflow-hidden border-t sm:border-y border-white/5">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="flex items-center gap-8 sm:gap-12 mx-4 sm:mx-6">
-              <span className="text-3xl sm:text-5xl md:text-7xl font-black text-brand-orange uppercase tracking-tighter">Accessible Transport</span>
-              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-brand-blue-light"></div>
-              <span className="text-3xl sm:text-5xl md:text-7xl font-black text-brand-orange uppercase tracking-tighter">Civil Crew Bus Hire</span>
-              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-brand-blue-light"></div>
-              <span className="text-3xl sm:text-5xl md:text-7xl font-black text-brand-orange uppercase tracking-tighter">Corporate Charters</span>
-              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-brand-blue-light"></div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* About Us Section - Oversized Typographic */}
-      <section id="about" data-header-theme="light" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-[#fafafa] relative overflow-hidden">
+      <section id="about" data-header-theme="light" className="pt-8 md:pt-12 pb-16 md:pb-24 bg-[#fafafa] relative overflow-hidden">
         <div className="container mx-auto px-6 max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -614,54 +691,14 @@ function Home() {
               transition={{ duration: 0.8, delay: 0.1 }}
               className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl text-brand-blue font-medium leading-[1.3] md:leading-[1.1] tracking-tight md:tracking-tighter"
             >
-              Melbourne's most trusted transport provider for <span className="text-brand-orange italic serif">NDIS accessible transport, corporate charters,</span> civil crew buses, and professional removals.
+              Australia's trusted partner for <span className="text-brand-orange italic font-serif">chauffeur services, accessible transport, corporate mobility</span> and rail replacement transport.
             </motion.h2>
-            <div className="mt-12 md:mt-20 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12">
-              <div className="text-center">
-                <motion.span
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, type: "spring" }}
-                  className="block text-4xl sm:text-5xl font-medium tracking-tighter text-brand-blue mb-1 md:mb-2"
-                >
-                  1
-                </motion.span>
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Year in Business</span>
-              </div>
-              <div className="hidden sm:block w-px h-12 bg-zinc-200"></div>
-              <div className="text-center">
-                <motion.span
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.1, type: "spring" }}
-                  className="block text-4xl sm:text-5xl font-medium tracking-tighter text-brand-blue mb-1 md:mb-2"
-                >
-                  24/7
-                </motion.span>
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Scalable Solutions</span>
-              </div>
-              <div className="hidden sm:block w-px h-12 bg-zinc-200"></div>
-              <div className="text-center">
-                <motion.span
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
-                  className="block text-4xl sm:text-5xl font-medium tracking-tighter text-brand-blue mb-1 md:mb-2"
-                >
-                  100%
-                </motion.span>
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Safe & Compliant</span>
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Services Section - Sticky Editorial Layout */}
-      <section id="services" data-header-theme="dark" className="relative bg-brand-blue py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden">
+      <section id="services" data-header-theme="dark" className="relative bg-brand-blue py-16 md:py-24 overflow-hidden">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
             <motion.div
@@ -671,17 +708,15 @@ function Home() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-5 lg:sticky lg:top-32"
             >
-              <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-12">
-                <span className="text-xl sm:text-2xl font-black text-brand-orange leading-none tracking-tighter">02</span>
-                <div className="h-px w-12 sm:w-24 bg-gradient-to-r from-brand-orange/50 to-transparent"></div>
-                <span className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em]">Capabilities</span>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-8 h-px bg-brand-orange"></span>
+                <span className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em]">Service Overview</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white tracking-tighter font-medium leading-[0.9] mb-4 sm:mb-6 md:mb-8">
-                Intelligent <br />
-                <span className="text-brand-orange italic serif">Mobility.</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-medium tracking-tight leading-[1.1] mb-5">
+                Specialist transport <span className="italic font-serif text-brand-orange">solutions across Australia.</span>
               </h2>
-              <p className="text-sm sm:text-base md:text-lg text-white/70 font-light leading-relaxed mb-6 sm:mb-8 md:mb-12 max-w-sm">
-                We provide the high-performance fleet layer that Melbourne's most critical operations rely on.
+              <p className="text-sm sm:text-base text-white/60 font-light leading-relaxed max-w-md mb-8 sm:mb-10">
+                Premium chauffeur, accessible transport, airport transfers, logistics, public disruption transport and fleet hire — for passengers, businesses and infrastructure partners.
               </p>
               <a href="#contact" className="inline-flex items-center gap-2 sm:gap-3 text-white font-medium text-[10px] sm:text-xs uppercase tracking-widest hover:text-brand-orange transition-colors group">
                 Request Service
@@ -691,33 +726,27 @@ function Home() {
 
             <div className="lg:col-span-7 space-y-4 sm:space-y-6 md:space-y-8 mt-8 sm:mt-12 lg:mt-0">
               {[
-                { title: "Vehicle Hire Melbourne", desc: "Short and long-term vehicle hire for individuals and businesses across Melbourne.", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800&auto=format&fit=crop" },
-                { title: "Wheelchair Accessible Transport", desc: "Wheelchair-accessible vehicles for individuals and group travel. Safe, compliant transport solutions designed for NDIS and accessibility needs.", img: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?q=80&w=800&auto=format&fit=crop" },
-                { title: "Corporate Event Shuttles", desc: "Corporate shuttle services, event transport coordination, airport transfers and professional group movements.", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop" },
-                { title: "Group Transport", desc: "Private and group tours throughout Melbourne and regional Victoria. Charter transport for organisations, visitors, and events.", img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=800&auto=format&fit=crop" },
-                { title: "School Transport", desc: "Reliable school bus services. Group transport including safe airport pickup and drop-off services.", img: "https://images.unsplash.com/photo-1557223562-6c77ef16210f?q=80&w=800&auto=format&fit=crop" },
-                { title: "Disruption Support", desc: "Temporary shuttle and replacement transport services during public transport network disruptions.", img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800&auto=format&fit=crop" },
-                { title: "Melbourne Removalists", desc: "Professional residential and commercial removals within Melbourne and interstate logistics.", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop" },
-                { title: "Civil Crew Bus Hire", desc: "Crew bus services designed to meet civil construction and infrastructure project specifications. Safe workforce transport.", img: "https://images.unsplash.com/photo-1581094751227-43b4852bb2f7?q=80&w=800&auto=format&fit=crop" }
+                { title: "Chauffeur Services", desc: "Premium executive transport for business leaders, private clients, VIP guests, weddings and professional travel with experienced chauffeurs and luxury vehicles.", slug: "chauffeur" },
+                { title: "Wheelchair Accessible Transport", desc: "Safe, dignity-first transport with wheelchair-accessible vehicles, trained drivers and inclusive travel support for healthcare, aged care, NDIS and assisted mobility journeys.", slug: "wheelchair-accessible" },
+                { title: "Airport Transfers", desc: "Reliable airport transport with flight monitoring, meet & greet services, luggage support and fixed-fare private transfers for individuals and groups.", slug: "airport-transfers" },
+                { title: "Event & Corporate Transport", desc: "Scalable transport solutions for conferences, workforce movement, executive travel, event logistics and guest transport coordination.", slug: "event-corporate" },
+                { title: "Logistics Transport", desc: "Flexible commercial transport for documents, parcels, scheduled business deliveries and time-sensitive logistics support.", slug: "logistics" },
+                { title: "Public Disruption Transport", desc: "Rapid-response transport solutions for rail replacement services, infrastructure works, emergency movement, event overflow transport and public network disruption support. Our flexible fleet and trained operators can support transport authorities, contractors and government agencies during planned or unexpected service interruptions.", slug: "rail-replacement" },
+                { title: "Vehicle Hire", desc: "Flexible vehicle hire solutions ranging from executive sedans and SUVs to accessible vans, minibuses and specialist transport fleet options.", slug: "vehicle-hire" }
               ].map((service, idx) => (
-                <motion.div
+                <motion.a
                   key={idx}
-                  tabIndex={0}
+                  href={`/services/${service.slug}`}
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="group relative block overflow-hidden rounded-2xl sm:rounded-3xl md:rounded-[2rem] bg-white/[0.03] border border-white/10 p-6 sm:p-8 md:p-10 hover:-translate-y-2 focus:-translate-y-2 active:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] focus:shadow-2xl active:shadow-2xl hover:border-brand-orange/40 transition-all duration-500 cursor-pointer outline-none"
+                  className="group relative block overflow-hidden rounded-2xl sm:rounded-3xl bg-white/[0.02] border border-white/10 p-6 sm:p-8 md:p-10 hover:bg-white/[0.04] hover:border-white/20 transition-all duration-500 cursor-pointer outline-none"
                 >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 group-focus:opacity-100 group-active:opacity-100 transition-opacity duration-700">
-                    <img src={service.img} alt={service.title} loading="lazy" className="w-full h-full object-cover scale-110 group-hover:scale-100 group-focus:scale-100 group-active:scale-100 transition-transform duration-[1.5s]" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-blue via-brand-blue/80 to-transparent backdrop-blur-[1px]"></div>
-                  </div>
                   <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 md:gap-8">
                     <div className="flex-1 max-w-lg">
                       <div className="flex items-center gap-3 mb-2 sm:mb-4">
                         <span className="text-[10px] sm:text-xs font-bold text-brand-orange/50 uppercase tracking-[0.2em]">0{idx + 1}</span>
-                        <div className="h-px w-8 bg-brand-orange/20"></div>
                       </div>
                       <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white mb-2 sm:mb-3 md:mb-4 tracking-tight group-hover:translate-x-2 transition-transform duration-500">{service.title}</h3>
                       <p className="text-xs sm:text-sm md:text-base text-zinc-400 font-light leading-relaxed group-hover:translate-x-2 transition-transform duration-500 delay-75">{service.desc}</p>
@@ -730,6 +759,221 @@ function Home() {
                       <iconify-icon icon="solar:arrow-right-up-linear" width="20" className="sm:w-[24px]"></iconify-icon>
                     </motion.div>
                   </div>
+                </motion.a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Fleet Snapshot (PDF Section 3) */}
+      <div data-header-theme="light">
+        <FleetSection />
+      </div>
+
+      {/* Standards & Commitment Section */}
+      <section id="standards" data-header-theme="light" className="pt-4 pb-16 md:pt-6 md:pb-24 bg-white relative overflow-hidden">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-10 md:mb-14"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-8 h-px bg-brand-orange"></span>
+              <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">Compliance & Safety</span>
+            </div>
+            <div className="max-w-3xl">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-brand-blue font-medium tracking-tight leading-[1.1]">
+                Built on trust. <span className="italic font-serif text-brand-orange">Backed by standards.</span>
+              </h2>
+              <p className="mt-4 text-sm sm:text-base text-zinc-500 font-light leading-relaxed max-w-2xl">
+                Accredited operations, insured fleet, trained drivers and inclusive service — ready for corporate and government contracts.
+              </p>
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              { title: "Licensed & Accredited", desc: "Commercial transport compliance.", icon: "solar:shield-check-linear", dark: false },
+              { title: "Fully Insured Fleet", desc: "Passenger and commercial protection.", icon: "solar:shield-user-linear", dark: true },
+              { title: "Safety Compliant Vehicles", desc: "Regularly maintained fleet.", icon: "solar:settings-linear", dark: false },
+              { title: "Professional Drivers", desc: "Background checked and trained.", icon: "solar:user-id-linear", dark: false },
+              { title: "Accessibility Ready", desc: "Inclusive transport support.", icon: "solar:hand-heart-linear", dark: true },
+              { title: "Contract Ready", desc: "Corporate and government partnerships.", icon: "solar:document-text-linear", dark: false },
+            ].map((b, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className={`rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 relative group transition-colors duration-500 ${b.dark ? 'bg-brand-blue text-white hover:bg-[#03316f]' : 'bg-zinc-50 text-brand-blue hover:bg-zinc-100'}`}
+              >
+                <div className="relative z-10">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-6 sm:mb-8 ${b.dark ? 'bg-white/10 text-white' : 'bg-white text-brand-blue shadow-sm'}`}>
+                    <iconify-icon icon={b.icon} width="22"></iconify-icon>
+                  </div>
+                  <h3 className={`text-lg sm:text-xl md:text-2xl font-medium mb-2 sm:mb-3 tracking-tight ${b.dark ? 'text-white' : 'text-brand-blue'}`}>{b.title}</h3>
+                  <p className={`text-sm sm:text-base font-light leading-relaxed ${b.dark ? 'text-zinc-300' : 'text-zinc-500'}`}>
+                    {b.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* Corporate & Government Solutions (PDF Section 4) */}
+      <section id="corporate" data-header-theme="dark" className="py-16 md:py-24 bg-brand-blue text-white relative overflow-hidden">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-10 md:mb-14"
+          >
+            <span className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em]">Corporate & Government Solutions</span>
+          </motion.div>
+
+          {/* Capability tags */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-12 md:mb-16">
+            {[
+              { title: "Workforce Transport" },
+              { title: "Rail Replacement" },
+              { title: "Contract Fleet" },
+              { title: "Infrastructure Support" },
+              { title: "Event Transport" },
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                className="p-5 sm:p-6 bg-white/[0.03] border border-white/10 rounded-2xl hover:bg-white/[0.06] hover:border-white/20 transition-colors duration-500"
+              >
+                <h3 className="text-base sm:text-lg font-medium text-white tracking-tight">{item.title}</h3>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Descriptive content blocks (PDF page 3) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-12 md:mb-16">
+            {[
+              {
+                title: 'Public Disruption',
+                body: 'We deliver rapid-response transport solutions for rail replacement services, planned infrastructure works, emergency passenger movement and network disruption support across Australia.',
+              },
+              {
+                title: 'Corporate',
+                body: 'Scalable mobility solutions for workforce transport, executive travel, infrastructure support, healthcare movement and long-term transport contracts.',
+              },
+              {
+                title: 'Accessibility',
+                body: 'Inclusive transport built around safety, dignity and independence with specialist vehicles and trained drivers.',
+              },
+            ].map((b, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                className="p-6 sm:p-8 bg-white/[0.03] border border-white/10 rounded-2xl sm:rounded-3xl"
+              >
+                <h3 className="text-lg sm:text-xl font-medium text-white mb-3 tracking-tight">{b.title}</h3>
+                <p className="text-sm sm:text-base text-white/60 font-light leading-relaxed">{b.body}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Government & Infrastructure block (PDF page 3) */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6 }}
+            className="border-t border-white/10 pt-12 md:pt-16"
+          >
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
+              <div className="lg:col-span-5">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight leading-[1.15]">
+                  Government & Infrastructure <span className="italic font-serif text-brand-orange">Transport Solutions</span>
+                </h3>
+              </div>
+              <div className="lg:col-span-7">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 font-light leading-relaxed mb-8">
+                  We partner with transport operators, event organisers, infrastructure contractors, healthcare providers and businesses to deliver scalable mobility solutions.
+                </p>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                  {[
+                    'Rail replacement transport',
+                    'Emergency transport deployment',
+                    'Workforce mobility',
+                    'Accessible public transport support',
+                    'Infrastructure project transport',
+                    'Contract fleet operations',
+                  ].map((cap) => (
+                    <li key={cap} className="flex items-center gap-3 text-sm sm:text-base text-white/85">
+                      <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-brand-orange shrink-0"></span>
+                      {cap}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Why Choose Us (PDF Section 6) */}
+      <section id="why-us" data-header-theme="light" className="py-16 md:py-24 bg-[#fafafa] relative overflow-hidden">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-5"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-8 h-px bg-brand-orange"></span>
+                <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">Why Choose Us</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl text-brand-blue font-medium tracking-tight leading-[1.1]">
+                Specialist transport. <span className="italic font-serif text-brand-orange">Built for scale.</span>
+              </h2>
+              <p className="mt-5 text-sm sm:text-base text-zinc-500 font-light leading-relaxed">
+                Trusted transport contractor across Australia for corporate, government, healthcare and infrastructure partners.
+              </p>
+            </motion.div>
+
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {[
+                { title: '24/7 Availability', desc: 'Round-the-clock dispatch for planned and emergency transport.' },
+                { title: 'Flexible Fleet', desc: 'Sedans to mini buses scaled to job requirements.' },
+                { title: 'Rapid Deployment', desc: 'Fast mobilisation for rail replacement and disruption work.' },
+                { title: 'Transport Specialists', desc: 'Trained operators across accessible, corporate and logistics transport.' },
+                { title: 'Customer-First Support', desc: 'Direct account contact for contracts and recurring bookings.' },
+              ].map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-50px' }}
+                  transition={{ duration: 0.5, delay: idx * 0.06 }}
+                  className="bg-white border border-zinc-100 rounded-2xl p-5 sm:p-6 hover:border-brand-orange/40 hover:shadow-sm transition-all duration-300"
+                >
+                  <span className="text-[10px] font-bold text-brand-orange tracking-[0.25em] tabular-nums">0{idx + 1}</span>
+                  <h3 className="mt-3 text-base sm:text-lg font-medium text-brand-blue tracking-tight">{item.title}</h3>
+                  <p className="mt-1.5 text-xs sm:text-sm text-zinc-500 font-light leading-relaxed">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -737,174 +981,57 @@ function Home() {
         </div>
       </section>
 
-      {/* Standards & Commitment Section */}
-      <section id="standards" data-header-theme="light" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white relative overflow-hidden">
+      {/* Sectors Served Strip */}
+      <section data-header-theme="dark" className="bg-brand-blue text-white py-14 md:py-20 relative overflow-hidden">
         <div className="container mx-auto px-6 max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col md:flex-row justify-between items-end mb-12 sm:mb-20 md:mb-24"
-          >
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-xl sm:text-2xl font-black text-zinc-200 leading-none tracking-tighter">03</span>
-                <div className="h-px w-12 sm:w-24 bg-gradient-to-r from-zinc-200 to-transparent"></div>
-                <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">Our Standards</span>
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-100px' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-5"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-8 h-px bg-brand-orange"></span>
+                <span className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em]">Sectors We Serve</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-brand-blue tracking-tighter font-medium leading-[0.9]">
-                Safe, compliant <br />& <span className="text-brand-orange italic serif">dependable.</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight leading-[1.1]">
+                Transport partner for <span className="italic font-serif text-brand-orange">operators, contractors, government.</span>
               </h2>
-            </div>
-            <div className="mt-8 md:mt-0 max-w-sm">
-              <p className="text-sm sm:text-base md:text-lg text-zinc-500 font-light leading-relaxed border-l-2 border-brand-orange/30 pl-6">
-                We are committed to delivering safe, compliant, and dependable transport solutions, supported by professional drivers and well-maintained vehicles.
+              <p className="mt-5 text-sm sm:text-base text-white/60 font-light leading-relaxed max-w-xl">
+                Rail replacement transport, accessible mobility, corporate fleet and infrastructure project transport — delivered across Melbourne, Sydney, Brisbane, Perth and Adelaide.
               </p>
+            </motion.div>
+
+            <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              {[
+                { label: 'Transport Authorities', icon: 'solar:tram-linear' },
+                { label: 'Infrastructure Contractors', icon: 'solar:buildings-2-linear' },
+                { label: 'Government Agencies', icon: 'solar:shield-keyhole-linear' },
+                { label: 'Healthcare & NDIS', icon: 'solar:health-linear' },
+                { label: 'Corporate & Events', icon: 'solar:case-linear' },
+                { label: 'Aged Care Providers', icon: 'solar:users-group-rounded-linear' },
+              ].map((s, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-50px' }}
+                  transition={{ duration: 0.5, delay: i * 0.05 }}
+                  className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 sm:p-6 hover:bg-white/[0.06] hover:border-brand-orange/30 transition-all duration-300"
+                >
+                  <iconify-icon icon={s.icon} width="22" class-name="text-brand-orange"></iconify-icon>
+                  <p className="mt-3 text-xs sm:text-sm font-medium text-white tracking-tight">{s.label}</p>
+                </motion.div>
+              ))}
             </div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
-            {/* Card 1 */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="md:col-span-8 bg-zinc-50 rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] p-6 sm:p-8 md:p-16 relative overflow-hidden group"
-            >
-              <div className="absolute top-0 right-0 p-6 sm:p-8 md:p-12 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
-                <span className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter">01</span>
-              </div>
-              <div className="relative z-10">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-full bg-white flex items-center justify-center text-brand-blue mb-6 sm:mb-8 md:mb-12 shadow-sm">
-                  <iconify-icon icon="solar:shield-user-linear" width="24" className="w-[20px] sm:w-[24px]"></iconify-icon>
-                </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-brand-blue mb-3 sm:mb-4 md:mb-6 tracking-tight">Professional Drivers</h3>
-                <p className="text-sm sm:text-base md:text-lg text-zinc-500 font-light leading-relaxed max-w-md">
-                  Expertly trained professionals prioritizing your safety, comfort, and timely arrivals on every journey.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Card 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="md:col-span-4 bg-brand-blue rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] p-6 sm:p-8 md:p-16 relative overflow-hidden group text-white"
-            >
-              <div className="absolute top-0 right-0 p-6 sm:p-8 md:p-12 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
-                <span className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter text-white">02</span>
-              </div>
-              <div className="relative z-10 h-full flex flex-col">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-full bg-white/10 flex items-center justify-center text-white mb-6 sm:mb-8 md:mb-12 backdrop-blur-md">
-                  <iconify-icon icon="solar:settings-linear" width="24" className="w-[20px] sm:w-[24px]"></iconify-icon>
-                </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-3 sm:mb-4 md:mb-6 tracking-tight mt-auto">Well-Maintained Vehicles</h3>
-                <p className="text-sm sm:text-base md:text-lg text-zinc-400 font-light leading-relaxed">
-                  A modern, rigorously serviced fleet ensuring reliability, performance, and accessibility for all.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Card 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="md:col-span-12 bg-zinc-100 rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] p-6 sm:p-8 md:p-16 relative overflow-hidden group flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 md:gap-12"
-            >
-              <div className="absolute -bottom-10 -right-10 opacity-5 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
-                <iconify-icon icon="solar:heart-bold" width="150" className="w-[100px] sm:w-[200px] md:w-[300px]"></iconify-icon>
-              </div>
-              <div className="relative z-10 max-w-2xl">
-                <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-full bg-white flex items-center justify-center text-brand-blue shadow-sm">
-                    <iconify-icon icon="solar:heart-linear" width="24" className="w-[20px] sm:w-[24px]"></iconify-icon>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-base sm:text-lg font-black text-brand-blue/20 leading-none tracking-tighter uppercase">03</span>
-                    <div className="h-px w-8 bg-brand-blue/10"></div>
-                  </div>
-                </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-medium text-brand-blue mb-3 sm:mb-4 md:mb-6 tracking-tight">Customer Service Focus</h3>
-                <p className="text-sm sm:text-base md:text-xl text-zinc-500 font-light leading-relaxed">
-                  Dedicated to seamless experiences, scalable solutions, and dependable support for individuals and enterprises.
-                </p>
-              </div>
-              <div className="relative z-10 shrink-0 self-start md:self-auto mt-4 md:mt-0">
-                <a href="#contact" className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full bg-brand-orange text-white flex flex-col items-center justify-center gap-1 md:gap-2 hover:bg-brand-orange-light transition-colors group/btn shadow-xl">
-                  <span className="text-[8px] sm:text-[10px] uppercase tracking-widest font-bold">Connect</span>
-                  <iconify-icon icon="solar:arrow-right-up-linear" width="16" className="w-[12px] md:w-[20px] group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform"></iconify-icon>
-                </a>
-              </div>
-            </motion.div>
           </div>
         </div>
       </section>
-
-      {/* Sectors We Serve (Clients) Section */}
-      <section id="clients" data-header-theme="light" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-zinc-50 relative overflow-hidden">
-        <div className="container mx-auto px-6 max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col md:flex-row justify-between items-end mb-12 sm:mb-20 md:mb-24"
-          >
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-xl sm:text-2xl font-black text-zinc-200 leading-none tracking-tighter">04</span>
-                <div className="h-px w-12 sm:w-24 bg-gradient-to-r from-zinc-200 to-transparent"></div>
-                <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">Sectors We Serve</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-brand-blue tracking-tighter font-medium leading-[0.9]">
-                Powering Victoria's <br /><span className="text-brand-orange italic serif">Critical Projects.</span>
-              </h2>
-            </div>
-            <div className="mt-8 md:mt-0 max-w-sm">
-              <p className="text-sm sm:text-base md:text-lg text-zinc-500 font-light leading-relaxed border-l-2 border-brand-orange/30 pl-6">
-                From major civil construction sites to high-stakes corporate movements, we provide the reliable transport backbone for Victoria's most vital sectors.
-              </p>
-            </div>
-          </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 md:gap-8">
-            {[
-              { name: "Civil Construction", icon: "solar:buildings-linear" },
-              { name: "Corporate", icon: "solar:case-linear" },
-              { name: "Healthcare", icon: "solar:medical-kit-linear" },
-              { name: "Education", icon: "solar:notebook-linear" },
-              { name: "Tourism", icon: "solar:camera-linear" },
-              { name: "Logistics", icon: "solar:delivery-linear" }
-            ].map((sector, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group flex flex-col items-center justify-center p-6 sm:p-8 md:p-10 bg-white border border-zinc-200 rounded-2xl sm:rounded-3xl hover:border-brand-blue hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 text-center"
-              >
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-zinc-50 flex items-center justify-center text-brand-blue group-hover:bg-brand-orange group-hover:text-white group-hover:scale-110 transition-all duration-500 mb-4 sm:mb-6">
-                  <iconify-icon icon={sector.icon} width="24" className="sm:w-[32px] group-hover:rotate-12 transition-transform duration-500"></iconify-icon>
-                </div>
-                <h3 className="text-[10px] sm:text-xs md:text-sm font-bold text-brand-blue uppercase tracking-widest leading-tight">{sector.name}</h3>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Sleek Testimonials */}
-      <TestimonialsSection />
 
       {/* Luxury Contact Section */}
-      <section id="contact" data-header-theme="light" className="bg-[#fafafa] py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
+      <section id="contact" data-header-theme="light" className="bg-[#fafafa] py-16 md:py-24 relative">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-12 sm:gap-16 lg:gap-32">
             {/* Left Side: Typography & Info */}
@@ -914,20 +1041,9 @@ function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="flex flex-col gap-6 mb-12 sm:mb-16 md:mb-20">
-                <div className="flex items-center gap-4">
-                  <span className="text-xl sm:text-2xl font-black text-zinc-200 leading-none tracking-tighter uppercase">06</span>
-                  <div className="h-px w-12 sm:w-24 bg-gradient-to-r from-zinc-200 to-transparent"></div>
-                  <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">Connect</span>
-                </div>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-brand-blue tracking-tighter font-medium leading-[0.9]">
-                  Let's coordinate <br />
-                  <span className="text-zinc-400 italic serif">your next move.</span>
-                </h2>
+              <div className="mb-10 md:mb-14">
+                <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">CTA / Contact</span>
               </div>
-              <p className="text-sm sm:text-base md:text-lg text-zinc-500 font-light leading-relaxed max-w-md mb-8 sm:mb-12 md:mb-16">
-                Whether you require immediate executive transport or are planning a large-scale logistical operation, our team is ready to assist.
-              </p>
 
               <div className="space-y-6 sm:space-y-8 md:space-y-10">
                 <div>
@@ -1069,7 +1185,18 @@ function Home() {
                       </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-8">
+                    <form onSubmit={handleSubmit} className={`space-y-8 relative transition-opacity ${submitStatus === 'loading' ? 'pointer-events-none opacity-60' : ''}`}>
+                      {submitStatus === 'loading' && (
+                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/40 backdrop-blur-[2px] rounded-xl">
+                          <div className="flex flex-col items-center gap-3">
+                            <svg className="animate-spin h-8 w-8 text-brand-orange" viewBox="0 0 24 24" fill="none">
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="3" />
+                              <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                            </svg>
+                            <span className="text-[10px] font-medium text-brand-blue uppercase tracking-[0.2em]">{activeTab === 'booking' ? 'Confirming booking' : 'Sending message'}</span>
+                          </div>
+                        </div>
+                      )}
                       <AnimatePresence mode="wait">
                         {activeTab === 'booking' ? (
                           <>
@@ -1103,20 +1230,11 @@ function Home() {
                                   )}
                                   {errors.toLocation && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.toLocation}</span>}
                                 </div>
-                                <div className="relative">
-                                  <select id="service" value={formData.service} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.service ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm appearance-none`}>
-                                    <option value="" disabled>Select Service *</option>
-                                    <option value="vehicle-hire">Vehicle Hire Melbourne</option>
-                                    <option value="accessible">Wheelchair Accessible Transport (NDIS)</option>
-                                    <option value="corporate">Corporate Event Shuttle &amp; Airport Transfer</option>
-                                    <option value="tour">Tour &amp; Charter Bus Melbourne</option>
-                                    <option value="school">School &amp; Group Transport</option>
-                                    <option value="disruption">Transport Disruption Support</option>
-                                    <option value="removal">Melbourne Removalists &amp; Logistics</option>
-                                    <option value="civil">Civil Crew Bus Hire</option>
-                                  </select>
-                                  {errors.service && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.service}</span>}
-                                </div>
+                                <ServiceSelect
+                                  value={formData.service}
+                                  error={errors.service}
+                                  onChange={(val) => setFormData({ ...formData, service: val })}
+                                />
                                 <button type="button" onClick={nextStep} className="w-full py-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-orange-light transition-colors flex items-center justify-center gap-2">
                                   Next Step <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
                                 </button>
@@ -1156,7 +1274,7 @@ function Home() {
                                 exit={{ opacity: 0, x: -20 }}
                                 className="space-y-8"
                               >
-                                <div className="grid grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-6">
                                   <div className="relative">
                                     <input type="text" id="fullName" value={formData.fullName} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.fullName ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Full Name *" />
                                     {errors.fullName && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.fullName}</span>}
@@ -1175,8 +1293,11 @@ function Home() {
                                 </div>
                                 <div className="flex gap-4">
                                   <button type="button" onClick={prevStep} className="flex-1 py-4 border border-zinc-200 text-brand-blue text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-50 transition-colors">Back</button>
-                                  <button type="submit" disabled={submitStatus === 'loading'} className="flex-1 py-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-orange-light transition-colors disabled:opacity-50">
-                                    {submitStatus === 'loading' ? 'Processing...' : (formData.service && servicesAvailability[formData.service] === false ? 'Call Us' : 'Book')}
+                                  <button type="submit" disabled={submitStatus === 'loading'} className="flex-1 py-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-orange-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                                    {submitStatus === 'loading' && (
+                                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" /><path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+                                    )}
+                                    {submitStatus === 'loading' ? 'Confirming' : (formData.service && servicesAvailability[formData.service] === false ? 'Call Us' : 'Book')}
                                   </button>
                                 </div>
                               </motion.div>
@@ -1201,8 +1322,11 @@ function Home() {
                               <textarea id="message" value={formData.message} onChange={handleInputChange} rows={4} className={`w-full bg-transparent border-b ${errors.message ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm resize-none`} placeholder="How can we help you? *"></textarea>
                               {errors.message && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.message}</span>}
                             </div>
-                            <button type="submit" disabled={submitStatus === 'loading'} className="w-full py-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-orange-light transition-colors disabled:opacity-50">
-                              {submitStatus === 'loading' ? 'Sending...' : 'Send Message'}
+                            <button type="submit" disabled={submitStatus === 'loading'} className="w-full py-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-orange-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                              {submitStatus === 'loading' && (
+                                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" /><path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+                              )}
+                              {submitStatus === 'loading' ? 'Sending' : 'Send Message'}
                             </button>
                           </motion.div>
                         )}
@@ -1241,7 +1365,7 @@ function ScrollToTop() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-white text-black rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform"
+          className="hidden md:flex fixed bottom-6 right-6 z-40 w-12 h-12 bg-white text-black rounded-full shadow-xl items-center justify-center hover:scale-110 transition-transform"
           aria-label="Scroll to top"
         >
           <iconify-icon icon="solar:arrow-up-linear" width="24"></iconify-icon>
@@ -1251,13 +1375,276 @@ function ScrollToTop() {
   );
 }
 
+const SERVICE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'chauffeur', label: 'Chauffeur Services' },
+  { value: 'accessible', label: 'Wheelchair Accessible Transport' },
+  { value: 'airport', label: 'Airport Transfers' },
+  { value: 'corporate', label: 'Event & Corporate Transport' },
+  { value: 'logistics', label: 'Logistics Transport' },
+  { value: 'disruption', label: 'Public Disruption / Rail Replacement' },
+  { value: 'vehicle-hire', label: 'Vehicle Hire' },
+];
+
+function ServiceSelect({ value, onChange, error }: { value: string; onChange: (v: string) => void; error?: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = SERVICE_OPTIONS.find((o) => o.value === value);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative" id="service">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={`w-full bg-transparent border-b ${error ? 'border-red-300' : open ? 'border-brand-blue' : 'border-zinc-200'} py-4 text-left flex items-center justify-between transition-colors`}
+      >
+        <span className={`text-sm ${selected ? 'text-brand-blue' : 'text-zinc-400'}`}>
+          {selected ? selected.label : 'Select Service *'}
+        </span>
+        <iconify-icon
+          icon="solar:alt-arrow-down-linear"
+          width="16"
+          class-name={`text-zinc-400 transition-transform ${open ? 'rotate-180' : ''}`}
+        ></iconify-icon>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15 }}
+            role="listbox"
+            className="absolute top-full left-0 right-0 mt-2 z-50 bg-white border border-zinc-100 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden max-h-72 overflow-y-auto"
+          >
+            {SERVICE_OPTIONS.map((opt) => {
+              const active = opt.value === value;
+              return (
+                <li key={opt.value} role="option" aria-selected={active}>
+                  <button
+                    type="button"
+                    onClick={() => { onChange(opt.value); setOpen(false); }}
+                    className={`w-full text-left px-5 py-3.5 text-sm flex items-center justify-between gap-3 transition-colors ${active ? 'bg-brand-blue/[0.04] text-brand-blue' : 'text-zinc-700 hover:bg-zinc-50 hover:text-brand-blue'}`}
+                  >
+                    <span className="flex-1">{opt.label}</span>
+                    {active && (
+                      <iconify-icon icon="solar:check-circle-bold" width="18" class-name="text-brand-orange"></iconify-icon>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+      {error && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{error}</span>}
+    </div>
+  );
+}
+
+function QuickContact() {
+  const phone = '0411099994';
+  const wa = '61411099994';
+  return (
+    <div className="hidden md:flex fixed bottom-6 left-6 z-40 flex-col gap-3">
+      <a
+        href={`https://wa.me/${wa}?text=${encodeURIComponent("Hi, I'd like to enquire about transport.")}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on WhatsApp"
+        className="group w-12 h-12 rounded-full bg-white text-[#25D366] border border-zinc-200 flex items-center justify-center shadow-md hover:shadow-lg hover:bg-[#25D366] hover:text-white hover:border-[#25D366] transition-all duration-300"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.15-.174.2-.298.299-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488"/>
+        </svg>
+      </a>
+      <a
+        href={`tel:${phone}`}
+        aria-label="Call us"
+        className="group w-12 h-12 rounded-full bg-white text-brand-blue border border-zinc-200 flex items-center justify-center shadow-md hover:shadow-lg hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all duration-300"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      </a>
+    </div>
+  );
+}
+
+function StickyMobileBook() {
+  const [show, setShow] = useState(false);
+  const phone = '0411099994';
+  const wa = '61411099994';
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        const contact = document.getElementById('contact');
+        const past = window.scrollY > 600;
+        const inContact = contact ? contact.getBoundingClientRect().top < window.innerHeight - 100 : false;
+        setShow(past && !inContact);
+        raf = 0;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-brand-blue border-t border-white/10 px-3 py-3 flex items-center gap-2 shadow-[0_-8px_30px_-10px_rgba(0,0,0,0.4)]"
+        >
+          <a
+            href={`tel:${phone}`}
+            aria-label="Call"
+            className="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center shrink-0 active:bg-white/20"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </a>
+          <a
+            href={`https://wa.me/${wa}?text=${encodeURIComponent("Hi, I'd like to enquire about transport.")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+            className="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0 active:bg-[#1ebe5d]"
+          >
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.15-.174.2-.298.299-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488"/>
+            </svg>
+          </a>
+          <a
+            href="#contact"
+            className="flex-1 h-12 bg-brand-orange hover:bg-brand-orange-light text-white rounded-full flex items-center justify-center gap-2 transition-colors"
+          >
+            <span className="text-xs font-medium uppercase tracking-[0.2em]">Book Transport</span>
+            <iconify-icon icon="solar:arrow-right-up-linear" width="16"></iconify-icon>
+          </a>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function AcknowledgementPopup() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem('ct_aok_dismissed')) return;
+    const t = window.setTimeout(() => setIsOpen(true), 1200);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss(); };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  const dismiss = () => {
+    sessionStorage.setItem('ct_aok_dismissed', '1');
+    setIsOpen(false);
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          onClick={dismiss}
+          className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Acknowledgement of Country"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 10 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-[640px] rounded-2xl sm:rounded-3xl overflow-hidden bg-black shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]"
+          >
+            <button
+              type="button"
+              onClick={dismiss}
+              aria-label="Close"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur text-white flex items-center justify-center transition-colors"
+            >
+              <iconify-icon icon="solar:close-circle-linear" width="22"></iconify-icon>
+            </button>
+            <img
+              src="/images/pop-up.jpeg"
+              alt="Acknowledgement of Country — We acknowledge Aboriginal and Torres Strait Islander peoples as the Traditional Custodians of the land on which we operate, and we pay respect to their Elders past, present and emerging."
+              className="block w-full h-auto"
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function App() {
   return (
     <>
-      <Toaster position="bottom-right" theme="dark" />
+      <Toaster
+        position="top-right"
+        theme="dark"
+        richColors
+        closeButton
+        toastOptions={{
+          style: {
+            background: '#02285E',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: '#fff',
+            fontFamily: 'Outfit, sans-serif',
+          },
+        }}
+      />
       <ScrollToTop />
+      <QuickContact />
+      <StickyMobileBook />
+      <AcknowledgementPopup />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/services/:slug" element={<ServicePage />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/admin" element={<AdminDashboard />} />

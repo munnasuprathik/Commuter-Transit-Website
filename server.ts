@@ -11,7 +11,7 @@ dotenv.config();
 async function startServer() {
   console.log("Starting server initialization...");
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
+  const PORT = Number(process.env.PORT) || 3050;
 
   app.use(express.json());
 

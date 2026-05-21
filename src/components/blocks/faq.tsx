@@ -3,24 +3,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const faqs = [
   {
-    question: "Are you an NDIS-registered wheelchair accessible transport provider in Melbourne?",
-    answer: "Yes. Commuter Transit provides wheelchair-accessible transport across Melbourne for NDIS participants and individuals with mobility needs. Our vehicles are fully equipped with ramps and restraints, and our drivers are trained to assist passengers safely. We cover essential appointments, community outings, and group travel throughout Victoria."
+    question: "Do you provide chauffeur services across Australia?",
+    answer: "Yes. We deliver premium executive chauffeur services for business leaders, VIP guests, private clients, weddings and professional travel with experienced chauffeurs and luxury vehicles."
   },
   {
-    question: "Do you offer civil construction crew bus hire in Melbourne?",
-    answer: "Yes. We specialise in crew bus hire for civil construction and infrastructure projects across Melbourne and regional Victoria. Our fleet meets project site safety specifications and our workforce transport services operate on flexible schedules to suit early starts and shift changes."
+    question: "Do you offer wheelchair accessible transport?",
+    answer: "Yes. We provide safe, dignity-first wheelchair-accessible transport with trained drivers and inclusive travel support for healthcare, aged care, NDIS and assisted mobility journeys."
   },
   {
-    question: "What corporate event shuttle and airport transfer services do you provide?",
-    answer: "We offer corporate charter buses, executive airport transfers, conference shuttle services, and group event transport coordination across Melbourne. We cater to businesses requiring reliable transport for employees, clients, and guests — with punctuality and professionalism guaranteed."
+    question: "Do you provide rail replacement and public disruption transport?",
+    answer: "Yes. Rapid-response transport for rail replacement, planned infrastructure works, emergency passenger movement and network disruption support — for transport authorities, contractors and government agencies."
   },
   {
-    question: "Do you offer residential and commercial removals in Melbourne?",
-    answer: "Yes. Our removals service covers residential and commercial moves within Melbourne and interstate. We bring the same transport expertise and fleet reliability that powers our passenger services to every removal job — ensuring your move is safe, efficient, and stress-free."
+    question: "What corporate and event transport services do you provide?",
+    answer: "Scalable transport for conferences, workforce movement, executive travel, event logistics, airport transfers and guest transport coordination."
   },
   {
-    question: "What school and group transport services are available?",
-    answer: "Commuter Transit provides school bus services, student transport, group airport pickups and drop-offs, and charter buses for school excursions throughout Melbourne and Victoria. Safety is our priority for every student and group journey."
+    question: "Can I hire vehicles from your fleet?",
+    answer: "Yes. Flexible vehicle hire from executive sedans and SUVs to accessible vans, minibuses and specialist transport fleet for private travel, business operations and contract transport."
   }
 ];
 
@@ -31,7 +31,7 @@ export function FAQSection() {
     <section id="faq" className="py-24 md:py-32 bg-zinc-50">
       <div className="max-w-3xl mx-auto px-6">
         <div className="text-center mb-16 md:mb-24">
-          <h2 className="text-[40px] md:text-[80px] font-light tracking-tighter leading-none mb-6">
+          <h2 className="text-[40px] md:text-[80px] font-light tracking-tight leading-[1.1] mb-6">
             <span className="italic font-serif">Frequently</span> ASKED
           </h2>
           <p className="text-sm md:text-base text-zinc-500 font-light leading-relaxed">

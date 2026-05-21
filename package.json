@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build",
+    "build": "npm run sitemap && vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "sitemap": "tsx scripts/gen-sitemap.ts"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

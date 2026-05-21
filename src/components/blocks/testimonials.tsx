@@ -36,7 +36,7 @@ const TESTIMONIALS = [
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="bg-brand-blue py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
+    <section id="testimonials" className="bg-brand-blue py-16 md:py-24 relative overflow-hidden">
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-24">
           <motion.div 
@@ -46,15 +46,14 @@ export function TestimonialsSection() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-4 lg:sticky lg:top-32 h-fit"
           >
-            <div className="flex flex-col gap-6 mb-12 sm:mb-16 md:mb-20">
+            <div className="flex flex-col gap-6 mb-10 md:mb-14">
               <div className="flex items-center gap-4">
                 <span className="text-xl sm:text-2xl font-black text-white/20 leading-none tracking-tighter uppercase">05</span>
-                <div className="h-px w-12 sm:w-24 bg-gradient-to-r from-white/20 to-transparent"></div>
                 <span className="text-[10px] sm:text-xs font-bold text-white/40 uppercase tracking-[0.3em]">Client Voices</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white tracking-tighter font-medium leading-[0.9]">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white tracking-tight font-medium leading-[1.1]">
                 Trusted by <br />
-                <span className="text-brand-orange italic serif">Industry Leaders.</span>
+                <span className="text-brand-orange italic font-serif">Industry Leaders.</span>
               </h2>
             </div>
             <p className="text-sm sm:text-base md:text-lg text-white/70 font-light leading-relaxed">

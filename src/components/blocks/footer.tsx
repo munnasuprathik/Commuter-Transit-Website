@@ -5,101 +5,131 @@ import { motion } from 'framer-motion';
 
 export function Footer() {
   return (
-    <footer className="bg-brand-blue text-white pt-12 sm:pt-16 md:pt-20 pb-8">
-      <div className="container mx-auto px-6 max-w-7xl">
+    <footer className="relative bg-brand-blue text-white pt-16 md:pt-20 pb-6 md:pb-8 overflow-hidden">
+      <div className="container mx-auto px-6 max-w-7xl relative z-10">
         {/* Pre-footer CTA */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-16 sm:mb-20 md:mb-32 flex flex-col md:flex-row justify-between items-start md:items-end gap-8"
+          className="mb-12 md:mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-8 pb-12 md:pb-16 border-b border-white/10"
         >
-          <h2 className="text-3xl sm:text-5xl md:text-7xl font-medium tracking-tighter leading-[1.1]">
-            Need reliable transport <br />
-            <span className="text-brand-orange">in Melbourne?</span>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-[1.15] max-w-3xl">
+            Need specialist transport <span className="text-brand-orange">across Australia?</span>
           </h2>
-          <motion.a 
-            href="/#contact" 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="group flex flex-col items-center justify-center w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border border-white/20 hover:bg-brand-orange hover:text-white transition-all duration-500 shrink-0 mt-4 md:mt-0 shadow-2xl shadow-white/5"
+          <motion.a
+            href="/#contact"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="group inline-flex items-center gap-3 bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-4 rounded-full transition-colors shrink-0"
           >
-            <span className="text-[8px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1">Book Now</span>
-            <iconify-icon icon="solar:arrow-right-up-linear" width="16" className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></iconify-icon>
+            <span className="text-xs font-medium uppercase tracking-[0.2em]">Book Now</span>
+            <iconify-icon icon="solar:arrow-right-up-linear" width="16" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></iconify-icon>
           </motion.a>
         </motion.div>
 
         {/* Structured Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12">
-          <motion.div 
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="md:col-span-5"
+          >
+            <div className="h-36 sm:h-40 md:h-36 lg:h-40 mb-6 -ml-3">
+              <img src="/images/CT LOGO WHITE.png" alt="Commuter Transit Logo" className="h-full w-auto object-contain" />
+            </div>
+            <p className="text-white/70 font-light text-sm max-w-sm leading-relaxed mb-6">
+              Specialist transport and mobility solutions across Australia — chauffeur services, wheelchair accessible transport, airport transfers, corporate mobility, logistics, rail replacement and fleet hire.
+            </p>
+            <p className="text-[10px] font-medium text-white/40 uppercase tracking-[0.2em]">H&A Global Aus Pty Ltd</p>
+          </motion.div>
+
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="md:col-span-6 py-8 sm:py-10 md:py-12 md:border-r border-white/10 md:pr-12"
+            className="md:col-span-3"
           >
-            <div className="flex items-center gap-3 mb-4 sm:mb-6 md:mb-8">
-              <div className="h-28 sm:h-32 flex items-center justify-start p-1 -ml-4">
-                <img src="/images/CT LOGO WHITE.png" alt="Commuter Transit Logo" className="h-full w-auto object-contain" />
-              </div>
-            </div>
-            <p className="text-white/70 font-light text-sm max-w-sm leading-relaxed mt-4">
-              Melbourne's trusted provider for wheelchair-accessible transport, NDIS travel, corporate event shuttles, civil crew bus hire, and professional removals.
-              <br /><br />
-              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">H&A Global Aus Pty Ltd</span>
-            </p>
+            <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium mb-5">Navigate</h3>
+            <ul className="space-y-3">
+              <li><a href="/#services" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Services</a></li>
+              <li><a href="/#fleet" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Fleet</a></li>
+              <li><a href="/#corporate" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Corporate & Government</a></li>
+              <li><a href="/#standards" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Compliance</a></li>
+              <li><a href="/#why-us" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Why Us</a></li>
+              <li><a href="/#contact" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Book · Quote</a></li>
+            </ul>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="md:col-span-3 py-8 sm:py-10 md:py-12 md:border-r border-white/10 md:px-12"
+            className="md:col-span-4"
           >
-            <h3 className="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-4 sm:mb-6 md:mb-8">Navigation</h3>
-            <ul className="space-y-3 sm:space-y-4">
-              <li><a href="/#fleet" className="text-sm text-white/70 hover:text-white transition-colors font-light">The Fleet</a></li>
-              <li><a href="/#standards" className="text-sm text-white/70 hover:text-white transition-colors font-light">Our Standards</a></li>
-              <li><a href="/#faq" className="text-sm text-white/70 hover:text-white transition-colors font-light">FAQ</a></li>
-              <li><a href="/#booking" className="text-sm text-white/70 hover:text-white transition-colors font-light">Booking</a></li>
-            </ul>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="md:col-span-3 py-8 sm:py-10 md:py-12 md:pl-12"
-          >
-            <h3 className="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-4 sm:mb-6 md:mb-8">Contact</h3>
-            <ul className="space-y-3 sm:space-y-4">
-              <li><a href="mailto:info@commutertransit.com.au" className="text-sm text-white/70 hover:text-white transition-colors font-light break-all">info@commutertransit.com.au</a></li>
-              <li><span className="text-sm text-white/50 font-light">Epping, VIC, Australia</span></li>
+            <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium mb-5">Contact</h3>
+            <ul className="space-y-3">
+              <li>
+                <a href="mailto:info@commutertransit.com.au" className="text-sm text-white/80 hover:text-brand-orange transition-colors break-all">info@commutertransit.com.au</a>
+              </li>
+              <li>
+                <a href="tel:0411099994" className="text-sm text-white/80 hover:text-brand-orange transition-colors">0411 099 994</a>
+              </li>
+              <li>
+                <span className="text-sm text-white/60 leading-relaxed block">8 Langridge Drive<br />Epping VIC 3076</span>
+              </li>
             </ul>
           </motion.div>
         </div>
-        
-        {/* Bottom Bar */}
-        <motion.div 
+
+        {/* SEO keyword strip — subtle */}
+        <motion.nav
+          aria-label="Service keywords"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-4 text-center sm:text-left"
+          transition={{ duration: 0.8, delay: 0.35 }}
+          className="mt-14 md:mt-20 pt-6 border-t border-white/10"
         >
-          <p className="text-white/50 text-[10px] sm:text-xs font-light">
+          <ul className="flex flex-wrap justify-center md:justify-start gap-x-3 gap-y-2 text-[10px] sm:text-xs text-white/40 font-light tracking-wide">
+            <li><a href="/services/chauffeur" className="hover:text-brand-orange transition-colors">Chauffeur Services</a></li>
+            <li aria-hidden="true" className="text-white/15">·</li>
+            <li><a href="/services/airport-transfers" className="hover:text-brand-orange transition-colors">Airport Transfers</a></li>
+            <li aria-hidden="true" className="text-white/15">·</li>
+            <li><a href="/services/wheelchair-accessible" className="hover:text-brand-orange transition-colors">Wheelchair Accessible Transport</a></li>
+            <li aria-hidden="true" className="text-white/15">·</li>
+            <li><a href="/services/event-corporate" className="hover:text-brand-orange transition-colors">Corporate Transport</a></li>
+            <li aria-hidden="true" className="text-white/15">·</li>
+            <li><a href="/services/rail-replacement" className="hover:text-brand-orange transition-colors">Rail Replacement Services</a></li>
+            <li aria-hidden="true" className="text-white/15">·</li>
+            <li><a href="/services/vehicle-hire" className="hover:text-brand-orange transition-colors">Fleet Hire</a></li>
+            <li aria-hidden="true" className="text-white/15">·</li>
+            <li><a href="/services/logistics" className="hover:text-brand-orange transition-colors">Specialist Transport Solutions Australia</a></li>
+          </ul>
+        </motion.nav>
+
+        {/* Bottom Bar */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left"
+        >
+          <p className="text-white/40 text-[11px] font-light">
             &copy; {new Date().getFullYear()} Commuter Transit. All rights reserved.
           </p>
-          <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
-            <Link to="/privacy" className="text-white/50 hover:text-white text-[10px] sm:text-xs font-light transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="text-white/50 hover:text-white text-[10px] sm:text-xs font-light transition-colors">Terms of Service</Link>
+          <div className="flex gap-6 sm:gap-8">
+            <Link to="/privacy" className="text-white/40 hover:text-white text-[11px] font-light transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="text-white/40 hover:text-white text-[11px] font-light transition-colors">Terms of Service</Link>
           </div>
         </motion.div>
       </div>
     </footer>
   );
 }
-
