@@ -611,35 +611,104 @@ function Home() {
       </section>
 
 
-      {/* About Us Section - Oversized Typographic */}
+      {/* About Us Section */}
       <section id="about" data-header-theme="light" className="py-16 md:py-24 bg-white relative border-b border-gray-100">
         <div className="container mx-auto px-6 max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-5xl mx-auto text-center"
-          >
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-xs md:text-sm font-bold text-brand-orange uppercase tracking-[0.2em] mb-6 md:mb-10"
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            {/* Left Side: Typography */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              Trusted by individuals, hospitals, businesses & communities across Victoria
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl text-brand-blue font-medium leading-[1.2] md:leading-[1.1] tracking-tight md:tracking-tighter"
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-xs md:text-sm font-bold text-brand-orange uppercase tracking-[0.2em] mb-6"
+              >
+                Trusted by individuals, hospitals, businesses & communities across Victoria
+              </motion.p>
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.1 }}
+                className="text-3xl sm:text-4xl md:text-5xl text-brand-blue font-bold tracking-tight mb-8 leading-[1.15]"
+              >
+                Transport Built Around <span className="text-brand-orange italic">Reliability, Accessibility & Care</span>
+              </motion.h2>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="space-y-4 text-base sm:text-lg text-gray-500 font-light leading-relaxed"
+              >
+                <p>
+                  We understand that transport is more than getting from A to B — it is about safety, dignity, reliability and peace of mind.
+                </p>
+                <p>
+                  Our team is committed to delivering transport services that people can trust.
+                </p>
+              </motion.div>
+            </motion.div>
+
+            {/* Right Side: Metrics Bento Grid */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="grid sm:grid-cols-2 gap-4 sm:gap-5"
             >
-              Australia's trusted partner for <span className="text-brand-orange italic">chauffeur services, accessible transport, corporate mobility</span> and rail replacement transport.
-            </motion.h2>
-          </motion.div>
+              {/* Box 1: Brand Blue */}
+              <div className="bg-brand-blue rounded-[2rem] p-7 md:p-8 text-white flex flex-col justify-between hover:-translate-y-1 transition-transform duration-500 shadow-xl shadow-brand-blue/20 group">
+                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-brand-orange mb-8 sm:mb-12 group-hover:scale-110 transition-transform duration-500">
+                  <iconify-icon icon="lucide:clock" width="24"></iconify-icon>
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold mb-1 tracking-tight">24/7</h3>
+                  <p className="text-white/70 text-sm font-light">Dispatch Support</p>
+                </div>
+              </div>
+
+              {/* Box 2: Light Gray */}
+              <div className="bg-[#fafafa] border border-gray-100 rounded-[2rem] p-7 md:p-8 flex flex-col justify-between hover:-translate-y-1 transition-transform duration-500 group">
+                <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-brand-blue mb-8 sm:mb-12 group-hover:scale-110 transition-transform duration-500">
+                  <iconify-icon icon="lucide:map-pin" width="24"></iconify-icon>
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-brand-blue mb-1 tracking-tight">1000+</h3>
+                  <p className="text-gray-500 text-sm font-light">Trips Completed</p>
+                </div>
+              </div>
+
+              {/* Box 3: Clean White */}
+              <div className="bg-white border border-gray-100 rounded-[2rem] p-7 md:p-8 shadow-xl shadow-gray-200/40 flex flex-col justify-between hover:-translate-y-1 transition-transform duration-500 group">
+                <div className="w-12 h-12 bg-brand-orange/10 rounded-2xl flex items-center justify-center text-brand-orange mb-8 sm:mb-12 group-hover:scale-110 group-hover:bg-brand-orange group-hover:text-white transition-all duration-500">
+                  <iconify-icon icon="lucide:shield-check" width="24"></iconify-icon>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-brand-blue mb-1 tracking-tight">Professional</h3>
+                  <p className="text-gray-500 text-sm font-light">Driver Team</p>
+                </div>
+              </div>
+
+              {/* Box 4: Brand Orange */}
+              <div className="bg-brand-orange rounded-[2rem] p-7 md:p-8 text-white flex flex-col justify-between hover:-translate-y-1 transition-transform duration-500 shadow-xl shadow-brand-orange/20 group">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white mb-8 sm:mb-12 group-hover:scale-110 transition-transform duration-500">
+                  <iconify-icon icon="lucide:accessibility" width="24"></iconify-icon>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1 tracking-tight">Accessible</h3>
+                  <p className="text-white/90 text-sm font-light">Fleet Options</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
