@@ -716,7 +716,7 @@ function Home() {
       <section id="services" data-header-theme="light" className="relative bg-white py-16 md:py-24">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -724,15 +724,24 @@ function Home() {
             >
               OUR SERVICES
             </motion.span>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-3xl sm:text-4xl md:text-5xl text-[#050b14] font-bold tracking-tight"
+              className="text-3xl sm:text-4xl md:text-5xl text-[#050b14] font-bold tracking-tight mb-4 md:mb-6"
             >
-              Solutions for Every Journey
+              Professional Transport Services Across Victoria
             </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-sm sm:text-base md:text-lg text-gray-500 font-light leading-relaxed"
+            >
+              Flexible transport solutions for individuals, businesses, community organisations and specialist mobility needs.
+            </motion.p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
