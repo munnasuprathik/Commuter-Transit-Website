@@ -32,7 +32,7 @@ export function FAQSection() {
       <div className="max-w-3xl mx-auto px-6">
         <div className="text-center mb-16 md:mb-24">
           <h2 className="text-[40px] md:text-[80px] font-light tracking-tight leading-[1.1] mb-6">
-            <span className="italic font-serif">Frequently</span> ASKED
+            <span className="italic">Frequently</span> ASKED
           </h2>
           <p className="text-sm md:text-base text-zinc-500 font-light leading-relaxed">
             Common questions about our wheelchair accessible transport, civil crew bus hire, corporate charters, and removals in Melbourne.

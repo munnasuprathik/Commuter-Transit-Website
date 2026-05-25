@@ -52,9 +52,8 @@
   --color-brand-blue: #02285E;
   --color-brand-blue-light: #0149AF;
   --color-brand-orange: #FC6C03;
-  --color-brand-orange-light: #FD9E58;
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", serif;
+  --font-serif: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Custom Utilities */

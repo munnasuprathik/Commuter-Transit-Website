@@ -32,7 +32,7 @@ export function StandardsSection() {
           <div>
             <h2 className="text-[40px] md:text-[80px] font-light tracking-tight leading-[1.1] mb-8">
               OUR <br />
-              <span className="italic font-serif text-zinc-500">Standards</span>
+              <span className="italic text-zinc-500">Standards</span>
             </h2>
             <p className="text-sm md:text-base text-zinc-400 max-w-md font-light leading-relaxed mb-12">
               We don't just provide transport; we provide peace of mind. Our commitment to excellence is reflected in every detail of our service.
@@ -75,7 +75,7 @@ export function StandardsSection() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-blue via-transparent to-transparent"></div>
             <div className="absolute bottom-12 left-12 right-12">
-              <p className="text-2xl font-light tracking-tight italic font-serif">
+              <p className="text-2xl font-light tracking-tight italic">
                 "Excellence is not an act, but a habit."
               </p>
             </div>

@@ -56,10 +56,8 @@ function injectHead(service: ServiceContent) {
       email: 'info@commutertransit.com.au',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '8 Langridge Drive',
-        addressLocality: 'Epping',
+        addressLocality: 'Melbourne',
         addressRegion: 'VIC',
-        postalCode: '3076',
         addressCountry: 'AU',
       },
     },
@@ -170,7 +168,7 @@ export function ServicePage() {
                 <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">About this service</span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl text-brand-blue tracking-tight font-medium leading-[1.15]">
-                Built around <span className="italic font-serif text-brand-orange">your requirements.</span>
+                Built around <span className="italic text-brand-orange">your requirements.</span>
               </h2>
             </div>
             <div className="lg:col-span-7">
@@ -216,7 +214,7 @@ export function ServicePage() {
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.15] max-w-3xl">
-              Ready to book <span className="text-brand-orange italic font-serif">{service.headline.split(' ').slice(-2).join(' ').toLowerCase()}?</span>
+              Ready to book <span className="text-brand-orange italic">{service.headline.split(' ').slice(-2).join(' ').toLowerCase()}?</span>
             </h2>
             <div className="flex flex-col sm:flex-row gap-4 shrink-0">
               <Link

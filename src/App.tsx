@@ -5,7 +5,7 @@
 
 import React, { useEffect, useRef, useState, FormEvent } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import Fuse from 'fuse.js';
 import './types.d.ts';
 import { FleetSection } from './components/blocks/fleet';
@@ -47,6 +47,10 @@ function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [headerTheme, setHeaderTheme] = useState<'light' | 'dark'>('light');
+
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 1000], [0, 300]);
+
 
   const melbourneLocations = [
     'Melbourne Airport (MEL)',
@@ -338,97 +342,82 @@ function Home() {
 
   return (
     <>
-      {/* Ultra-Modern Split Header */}
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-        className={`absolute top-0 inset-x-0 z-50 transition-[padding] duration-300 ${isScrolled
-          ? 'py-4 px-4 md:px-8'
-          : 'p-4 md:p-8'
-          } flex justify-between items-center pointer-events-none`}
-      >
-
-        {/* Left: Logo */}
-        <motion.a
-          href="/"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.98 }}
-          className="pointer-events-auto group flex items-center justify-center transition-all duration-500"
-        >
-          <div className="h-20 md:h-28 flex items-center justify-center">
-            <img
-              src={headerTheme === 'dark' ? "/images/CT LOGO WHITE.png" : "/images/CT LOGO.png"}
-              alt="Commuter Transit Logo"
-              className="h-full w-auto object-contain transition-all duration-500"
-            />
+      {/* Ultra-Modern Header Inspired by Design */}
+      <header className="absolute top-0 inset-x-0 z-50 flex flex-col pointer-events-auto">
+        {/* Top Bar */}
+        <div className="bg-transparent border-b border-white/10 hidden lg:block w-full">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className="flex justify-center md:justify-end items-center py-2.5 gap-8 text-[11px] font-medium text-white/80 tracking-wide">
+              <div className="flex items-center gap-2">
+                <iconify-icon icon="solar:clock-circle-linear" width="16" className="text-brand-orange"></iconify-icon>
+                <span>24/7 DISPATCH SUPPORT</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <iconify-icon icon="solar:phone-calling-linear" width="16" className="text-brand-orange"></iconify-icon>
+                <a href="tel:0411099994" className="hover:text-brand-orange transition-colors">0411 099 994</a>
+              </div>
+              <div className="flex items-center gap-2">
+                <iconify-icon icon="solar:letter-linear" width="16" className="text-brand-orange"></iconify-icon>
+                <a href="mailto:info@commutertransit.com.au" className="hover:text-brand-orange transition-colors">info@commutertransit.com.au</a>
+              </div>
+            </div>
           </div>
-        </motion.a>
-
-        {/* Center: Magnetic Nav (Desktop) */}
-        <nav className={`pointer-events-auto hidden md:flex items-center p-1.5 backdrop-blur-xl border rounded-full transition-all duration-500 shadow-lg ${headerTheme === 'dark'
-            ? 'bg-black/20 border-white/10'
-            : 'bg-zinc-100/80 border-black/5'
-          }`}>
-          {[
-            { label: 'Services', href: '#services' },
-            { label: 'Fleet', href: '#fleet' },
-            { label: 'Corporate', href: '#corporate' },
-            { label: 'Compliance', href: '#standards' },
-            { label: 'Contact', href: '#contact' },
-          ].map((item, idx) => (
-            <motion.a
-              key={item.label}
-              href={item.href}
-              onMouseEnter={() => setHoveredNav(item.label)}
-              onMouseLeave={() => setHoveredNav(null)}
-              whileHover={{ y: -1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className={`relative px-6 py-2.5 text-[10px] font-bold transition-all duration-300 tracking-[0.2em] uppercase ${headerTheme === 'dark' ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-brand-blue'
-                }`}
-            >
-              {hoveredNav === item.label && (
-                <motion.div
-                  layoutId="nav-pill"
-                  className={`absolute inset-0 rounded-full ${headerTheme === 'dark' ? 'bg-white/10' : 'bg-brand-blue/5'
-                    }`}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-              <span className="relative z-10">{item.label}</span>
-            </motion.a>
-          ))}
-        </nav>
-
-        {/* Right: CTA & Status */}
-        <div className="pointer-events-auto flex items-center gap-3">
-          <div className={`hidden lg:flex items-center gap-2 backdrop-blur-xl border rounded-full px-4 py-2.5 transition-all duration-500 shadow-lg ${headerTheme === 'dark'
-              ? 'bg-black/20 border-white/10'
-              : 'bg-zinc-100/80 border-black/5'
-            }`}>
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-            <span className={`text-[9px] font-bold uppercase tracking-[0.2em] transition-colors duration-500 ${headerTheme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`}>Available 24/7</span>
-          </div>
-          <a href="#contact" className={`hidden md:flex group items-center gap-2 backdrop-blur-xl border px-8 py-3 rounded-full transition-all duration-500 shadow-lg ${headerTheme === 'dark'
-              ? 'bg-white text-brand-blue border-white hover:bg-zinc-100'
-              : 'bg-brand-blue text-white border-brand-blue hover:bg-brand-blue-light'
-            }`}>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500">Book</span>
-            <iconify-icon icon="solar:arrow-right-up-linear" width="16" className="transition-transform duration-500 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></iconify-icon>
-          </a>
-
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden w-12 h-12 backdrop-blur-xl border rounded-full flex items-center justify-center shadow-lg transition-all duration-500 pointer-events-auto ${headerTheme === 'dark'
-                ? 'bg-black/20 border-white/10 text-white'
-                : 'bg-zinc-100/80 border-black/5 text-brand-blue'
-              }`}
-          >
-            <iconify-icon icon={isMobileMenuOpen ? "solar:close-circle-linear" : "solar:hamburger-menu-linear"} width="20"></iconify-icon>
-          </button>
         </div>
-      </motion.header>
+
+        {/* Main Navigation */}
+        <div className="bg-transparent w-full transition-all duration-300">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? 'h-16 md:h-20' : 'h-20 md:h-24'}`}>
+              {/* Logo */}
+              <a href="/" className="flex-shrink-0 flex items-center h-full">
+                <img
+                  src="/images/CT LOGO WHITE.png"
+                  alt="Commuter Transit Logo"
+                  className="h-10 md:h-14 w-auto object-contain transition-all duration-300"
+                />
+              </a>
+
+              {/* Desktop Nav */}
+              <nav className="hidden lg:flex items-center gap-8">
+                {[
+                  { label: 'Home', href: '/' },
+                  { label: 'About Us', href: '#about' },
+                  { label: 'Services', href: '#services' },
+                  { label: 'Our Fleet', href: '#fleet' },
+                  { label: 'Contact', href: '#contact' },
+                ].map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-[13px] font-semibold text-white hover:text-brand-orange transition-colors flex items-center gap-1 uppercase tracking-wider relative group py-2"
+                  >
+                    {item.label}
+                    <span className={`absolute bottom-0 left-0 h-[2px] bg-brand-orange transition-all duration-300 ${item.label === 'Home' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+                  </a>
+                ))}
+              </nav>
+
+              {/* Book Now Button */}
+              <div className="hidden lg:flex items-center">
+                <a
+                  href="#contact"
+                  className="bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-3 text-sm font-bold tracking-widest rounded-md flex items-center gap-2 transition-colors uppercase shadow-md"
+                >
+                  BOOK NOW
+                </a>
+              </div>
+
+              {/* Mobile Menu Toggle */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden text-white hover:text-brand-orange transition-colors"
+              >
+                <iconify-icon icon={isMobileMenuOpen ? "solar:close-circle-linear" : "solar:hamburger-menu-linear"} width="32"></iconify-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
@@ -438,14 +427,14 @@ function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-brand-blue pt-24 px-6 pb-6 flex flex-col"
+            className="fixed inset-0 z-40 bg-brand-blue pt-28 px-6 pb-6 flex flex-col"
           >
-            <nav className="flex flex-col gap-8 text-center mt-12">
+            <nav className="flex flex-col gap-8 text-center mt-4">
               {[
+                { label: 'Home', href: '/' },
+                { label: 'About Us', href: '#about' },
                 { label: 'Services', href: '#services' },
-                { label: 'Fleet', href: '#fleet' },
-                { label: 'Corporate', href: '#corporate' },
-                { label: 'Compliance', href: '#standards' },
+                { label: 'Our Fleet', href: '#fleet' },
                 { label: 'Contact', href: '#contact' },
               ].map((item, idx) => (
                 <motion.a
@@ -453,9 +442,9 @@ function Home() {
                   href={item.href}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * idx, duration: 0.5 }}
+                  transition={{ delay: 0.1 * idx, duration: 0.3 }}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-3xl font-medium text-zinc-300 hover:text-white transition-colors tracking-widest uppercase"
+                  className="text-2xl font-semibold text-zinc-300 hover:text-brand-orange transition-colors tracking-widest uppercase"
                 >
                   {item.label}
                 </motion.a>
@@ -464,209 +453,166 @@ function Home() {
                 href="#contact"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
+                transition={{ delay: 0.6, duration: 0.3 }}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="mt-8 mx-auto inline-flex items-center gap-2 bg-white text-black px-10 py-5 rounded-full hover:bg-zinc-200 transition-colors shadow-2xl"
+                className="mt-8 mx-auto inline-flex items-center justify-center bg-brand-orange text-white px-10 py-4 rounded-md hover:bg-brand-orange-light transition-colors w-full max-w-xs"
               >
                 <span className="text-sm font-bold uppercase tracking-widest">Book Now</span>
-                <iconify-icon icon="solar:arrow-right-up-linear" width="18"></iconify-icon>
               </motion.a>
             </nav>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Hero Section - Modern Minimalist */}
-      <section id="hero" data-header-theme="dark" className="relative min-h-[100svh] flex items-center bg-brand-blue overflow-hidden pt-28 md:pt-36 pb-20 md:pb-28">
-        {/* Minimalist Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-blue-light/20 to-transparent pointer-events-none"></div>
+      {/* Hero Section */}
+      <section id="hero" data-header-theme="dark" className="relative min-h-[90svh] flex items-center bg-brand-blue pt-32 pb-16 md:pt-40 md:pb-32">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <motion.img 
+            style={{ y: y1 }}
+            src="/images/hero-bg.png" 
+            alt="Commuter Transit vehicle"
+            className="w-full h-full object-cover object-right-top"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050B14] via-[#050B14]/90 via-35% to-transparent"></div>
+        </div>
 
         <div className="container mx-auto px-6 max-w-7xl relative z-10">
-          <div className="grid lg:grid-cols-12 gap-12 lg:gap-24 items-center">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            {/* Left Content */}
+            <div className="lg:col-span-7 flex flex-col pt-8 md:pt-16">
+              <h1 className="text-4xl sm:text-5xl md:text-[3.5rem] font-bold text-white leading-[1.15] mb-6 tracking-tight">
+                Reliable Transport.<br />
+                Accessible Mobility.<br />
+                <span className="text-brand-orange">24/7.</span>
+              </h1>
 
-            {/* Typography Focus */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-6 flex flex-col justify-center order-2 lg:order-1"
-            >
-              <motion.div
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "3rem" }}
-                transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                className="mb-6 md:mb-8 hidden md:block"
-              ></motion.div>
+              <p className="text-white/90 text-base md:text-lg max-w-lg mb-10 font-medium leading-relaxed">
+                Safe, professional and on-time transport solutions for individuals, businesses and communities across Victoria.
+              </p>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] font-medium leading-[1.1] tracking-tight text-white mb-6 md:mb-8"
-              >
-                <TextReveal>Specialist Transport</TextReveal>
-                <TextReveal delay={0.1}><span className="text-zinc-500">& Mobility Solutions</span></TextReveal>
-                <TextReveal delay={0.2}>Across Australia.</TextReveal>
-              </motion.h1>
+              <div className="flex flex-wrap items-center gap-4">
+                <a href="#contact" onClick={() => { setActiveTab('booking'); setBookingStep(1); }} className="bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-3.5 text-xs md:text-sm font-bold tracking-widest rounded-md uppercase transition-colors shadow-lg">
+                  BOOK TRANSPORT
+                </a>
+                <a href="tel:0411099994" className="bg-transparent border border-white text-white hover:bg-white hover:text-black px-8 py-3.5 text-xs md:text-sm font-bold tracking-widest rounded-md flex items-center gap-2 uppercase transition-colors">
+                  <iconify-icon icon="solar:phone-calling-linear" width="18" className="text-brand-orange"></iconify-icon>
+                  CALL DISPATCH
+                </a>
+              </div>
+            </div>
 
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="text-zinc-400 font-light leading-relaxed max-w-md text-base sm:text-lg md:text-xl mb-8 md:mb-12"
-              >
-                Premium chauffeur services, wheelchair accessible transport, airport transfers, corporate mobility, logistics transport, rail replacement services and fleet hire — trusted by individuals, businesses and infrastructure partners across Australia.
-              </motion.p>
+            {/* Right Form Card (Solid White as per design) */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-end mt-8 lg:mt-0">
+              <div className="bg-white rounded-xl p-8 md:p-10 shadow-2xl w-full max-w-md relative overflow-hidden">
+                <div className="text-center mb-6 relative z-10">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">Get an Instant Quote</h3>
+                  <p className="text-gray-500 text-sm">Quick. Easy. No Obligation.</p>
+                </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6"
-              >
-                <MagneticButton href="#contact" onClick={() => setActiveTab('booking')} className="px-10 py-4 bg-brand-orange text-white text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] rounded-full hover:bg-brand-orange-light transition-colors duration-500 text-center">
-                  Book Transport
-                </MagneticButton>
-                <MagneticButton href="#contact" onClick={() => setActiveTab('contact')} className="px-10 py-4 bg-transparent text-white border border-white/25 text-[11px] sm:text-xs font-medium uppercase tracking-[0.2em] rounded-full hover:bg-white hover:text-brand-blue hover:border-white transition-all duration-500 text-center">
-                  Request Corporate Quote
-                </MagneticButton>
-              </motion.div>
+                <div className="space-y-4 relative z-10">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide">Pickup Location *</label>
+                    <input
+                      type="text"
+                      name="fromLocation"
+                      value={formData.fromLocation}
+                      onChange={handleInputChange}
+                      placeholder="Enter pickup address"
+                      className="w-full bg-white border border-gray-300 rounded-md px-4 py-3.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent text-sm placeholder:text-gray-400"
+                    />
+                  </div>
 
-              {/* Hero Booking Widget */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                className="mt-10 md:mt-14 max-w-2xl"
-              >
-                <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-2 sm:p-2.5 flex flex-col sm:flex-row gap-2 sm:items-center">
-                  <input
-                    type="text"
-                    name="fromLocation"
-                    aria-label="Pickup location"
-                    value={formData.fromLocation}
-                    onChange={handleInputChange}
-                    placeholder="Pickup"
-                    className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none"
-                  />
-                  <span aria-hidden="true" className="hidden sm:block w-px h-6 bg-white/10"></span>
-                  <input
-                    type="text"
-                    name="toLocation"
-                    aria-label="Destination"
-                    value={formData.toLocation}
-                    onChange={handleInputChange}
-                    placeholder="Destination"
-                    className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none"
-                  />
-                  <span aria-hidden="true" className="hidden sm:block w-px h-6 bg-white/10"></span>
-                  <select
-                    name="service"
-                    aria-label="Service type"
-                    value={formData.service}
-                    onChange={handleInputChange}
-                    className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white focus:outline-none cursor-pointer [&>option]:bg-brand-blue"
-                  >
-                    <option value="">Service type</option>
-                    <option value="chauffeur">Chauffeur Services</option>
-                    <option value="accessible">Wheelchair Accessible</option>
-                    <option value="airport">Airport Transfers</option>
-                    <option value="corporate">Event &amp; Corporate</option>
-                    <option value="logistics">Logistics</option>
-                    <option value="disruption">Public Disruption</option>
-                    <option value="vehicle-hire">Vehicle Hire</option>
-                  </select>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide">Destination *</label>
+                    <input
+                      type="text"
+                      name="toLocation"
+                      value={formData.toLocation}
+                      onChange={handleInputChange}
+                      placeholder="Enter destination"
+                      className="w-full bg-white border border-gray-300 rounded-md px-4 py-3.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent text-sm placeholder:text-gray-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide">Service Type</label>
+                    <div className="relative">
+                      <select
+                        name="service"
+                        value={formData.service}
+                        onChange={handleInputChange}
+                        className="w-full bg-white border border-gray-300 rounded-md px-4 py-3.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent appearance-none text-sm"
+                      >
+                        <option value="">Select Service</option>
+                        <option value="chauffeur">Chauffeur Services</option>
+                        <option value="accessible">Wheelchair Accessible Transport</option>
+                        <option value="airport">Airport Transfers</option>
+                        <option value="corporate">Event &amp; Corporate Transport</option>
+                        <option value="logistics">Logistics Transport</option>
+                        <option value="disruption">Public Disruption Transport</option>
+                        <option value="vehicle-hire">Vehicle Hire</option>
+                      </select>
+                      <iconify-icon icon="solar:alt-arrow-down-linear" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" width="16"></iconify-icon>
+                    </div>
+                  </div>
+
                   <button
                     type="button"
                     onClick={() => {
                       setActiveTab('booking');
-                      setBookingStep(1);
+                      if (formData.fromLocation.trim() && formData.toLocation.trim() && formData.service) {
+                        setBookingStep(2);
+                      } else {
+                        setBookingStep(1);
+                      }
                       const target = document.getElementById('contact');
                       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      window.setTimeout(() => {
-                        const focusId = !formData.fromLocation.trim()
-                          ? 'fromLocation'
-                          : !formData.toLocation.trim()
-                            ? 'toLocation'
-                            : 'fromLocation';
-                        const el = document.getElementById(focusId) as HTMLInputElement | null;
-                        if (el) el.focus({ preventScroll: true });
-                      }, 600);
                     }}
-                    className="shrink-0 bg-brand-orange hover:bg-brand-orange-light text-white px-6 py-3 rounded-xl text-[11px] font-medium uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-brand-orange hover:bg-brand-orange-light text-white font-bold py-4 rounded-md transition-colors mt-4 text-sm tracking-widest uppercase shadow-md flex justify-center items-center gap-2"
                   >
-                    Get Quote
-                    <iconify-icon icon="solar:arrow-right-linear" width="14"></iconify-icon>
+                    BOOK NOW
+                    <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
                   </button>
+
+                  <p className="text-center text-[11px] text-gray-500 mt-4">
+                    We'll call you back shortly.
+                  </p>
                 </div>
-              </motion.div>
-
-
-            </motion.div>
-
-            {/* Striking Visual Element */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-6 relative h-[40vh] sm:h-[50vh] lg:h-[80vh] w-full rounded-2xl md:rounded-3xl overflow-hidden order-1 lg:order-2 group shadow-2xl"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=2017&auto=format&fit=crop"
-                alt="Commuter Transit vehicle for accessible and corporate transport in Melbourne"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-blue/80 via-brand-blue/10 to-transparent"></div>
-
-              {/* Minimalist Floating Badge */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="absolute bottom-4 right-4 md:bottom-8 md:right-8 bg-black/40 backdrop-blur-2xl border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
-              >
-                <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 animate-pulse"></div>
-                  <p className="text-white text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">Operating 24/7</p>
-                </div>
-                <p className="text-zinc-400 text-[8px] sm:text-[9px] md:text-[10px] mt-1 md:mt-2 uppercase tracking-widest pl-3 sm:pl-4 md:pl-6">Melbourne & Interstate</p>
-              </motion.div>
-            </motion.div>
-
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Layered curved transition — hero → about */}
-        <div className="absolute -bottom-px left-0 right-0 pointer-events-none z-20" aria-hidden="true">
-          {/* Back layer — subtle depth wave */}
-          <svg
-            viewBox="0 0 1440 160"
-            preserveAspectRatio="none"
-            className="absolute bottom-0 left-0 right-0 w-full h-[90px] sm:h-[120px] md:h-[170px] block"
-          >
-            <path
-              d="M0,80 C200,140 420,160 720,120 C1020,80 1240,40 1440,90 L1440,161 L0,161 Z"
-              fill="#0149AF"
-              opacity="0.35"
-            />
-          </svg>
-          {/* Front layer — final fafafa curve */}
-          <svg
-            viewBox="0 0 1440 130"
-            preserveAspectRatio="none"
-            className="relative w-full h-[80px] sm:h-[110px] md:h-[150px] block"
-          >
-            <path
-              d="M0,30 C260,130 500,150 760,110 C1020,70 1240,40 1440,95 L1440,131 L0,131 Z"
-              fill="#fafafa"
-            />
-          </svg>
+        {/* Feature Bar */}
+        <div className="absolute bottom-0 inset-x-0 bg-brand-blue/90 backdrop-blur-md border-t border-white/10 hidden md:block z-20">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className="flex justify-between items-center py-4">
+              {[
+                { icon: "lucide:shield-check", title: "Verified Drivers", subtitle: "Police Checked" },
+                { icon: "lucide:shield", title: "Fully Insured", subtitle: "Comprehensive Cover" },
+                { icon: "lucide:shield-plus", title: "Safety First", subtitle: "Passenger Protection" },
+                { icon: "tabler:wheelchair", title: "Accessible Fleet", subtitle: "Wheelchair Ready" },
+                { icon: "lucide:clock", title: "24/7 Dispatch", subtitle: "Always Available" },
+              ].map((feature, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 border border-white/10">
+                    <iconify-icon icon={feature.icon} className="text-white text-xl"></iconify-icon>
+                  </div>
+                  <div>
+                    <h4 className="text-white text-xs font-bold leading-tight">{feature.title}</h4>
+                    <p className="text-white/60 text-[10px] leading-tight mt-0.5">{feature.subtitle}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
 
       {/* About Us Section - Oversized Typographic */}
-      <section id="about" data-header-theme="light" className="pt-8 md:pt-12 pb-16 md:pb-24 bg-[#fafafa] relative overflow-hidden">
+      <section id="about" data-header-theme="light" className="py-16 md:py-24 bg-white relative border-b border-gray-100">
         <div className="container mx-auto px-6 max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -675,93 +621,133 @@ function Home() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-5xl mx-auto text-center"
           >
-            <motion.span
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] mb-6 md:mb-12 block"
+              className="text-xs md:text-sm font-bold text-brand-orange uppercase tracking-[0.2em] mb-6 md:mb-10"
             >
-              01 — The Standard
-            </motion.span>
+              Trusted by individuals, hospitals, businesses & communities across Victoria
+            </motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl text-brand-blue font-medium leading-[1.3] md:leading-[1.1] tracking-tight md:tracking-tighter"
+              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl text-brand-blue font-medium leading-[1.2] md:leading-[1.1] tracking-tight md:tracking-tighter"
             >
-              Australia's trusted partner for <span className="text-brand-orange italic font-serif">chauffeur services, accessible transport, corporate mobility</span> and rail replacement transport.
+              Australia's trusted partner for <span className="text-brand-orange italic">chauffeur services, accessible transport, corporate mobility</span> and rail replacement transport.
             </motion.h2>
           </motion.div>
         </div>
       </section>
 
-      {/* Services Section - Sticky Editorial Layout */}
-      <section id="services" data-header-theme="dark" className="relative bg-brand-blue py-16 md:py-24 overflow-hidden">
+      {/* Services Section - Grid Layout */}
+      <section id="services" data-header-theme="light" className="relative bg-white py-16 md:py-24">
         <div className="container mx-auto px-6 max-w-7xl">
-          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-5 lg:sticky lg:top-32"
+          <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
+            <motion.span 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em] block mb-4"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <span className="w-8 h-px bg-brand-orange"></span>
-                <span className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em]">Service Overview</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-medium tracking-tight leading-[1.1] mb-5">
-                Specialist transport <span className="italic font-serif text-brand-orange">solutions across Australia.</span>
-              </h2>
-              <p className="text-sm sm:text-base text-white/60 font-light leading-relaxed max-w-md mb-8 sm:mb-10">
-                Premium chauffeur, accessible transport, airport transfers, logistics, public disruption transport and fleet hire — for passengers, businesses and infrastructure partners.
-              </p>
-              <a href="#contact" className="inline-flex items-center gap-2 sm:gap-3 text-white font-medium text-[10px] sm:text-xs uppercase tracking-widest hover:text-brand-orange transition-colors group">
-                Request Service
-                <iconify-icon icon="solar:arrow-right-linear" className="group-hover:translate-x-2 transition-transform" width="16"></iconify-icon>
-              </a>
-            </motion.div>
+              OUR SERVICES
+            </motion.span>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-3xl sm:text-4xl md:text-5xl text-[#050b14] font-bold tracking-tight"
+            >
+              Solutions for Every Journey
+            </motion.h2>
+          </div>
 
-            <div className="lg:col-span-7 space-y-4 sm:space-y-6 md:space-y-8 mt-8 sm:mt-12 lg:mt-0">
-              {[
-                { title: "Chauffeur Services", desc: "Premium executive transport for business leaders, private clients, VIP guests, weddings and professional travel with experienced chauffeurs and luxury vehicles.", slug: "chauffeur" },
-                { title: "Wheelchair Accessible Transport", desc: "Safe, dignity-first transport with wheelchair-accessible vehicles, trained drivers and inclusive travel support for healthcare, aged care, NDIS and assisted mobility journeys.", slug: "wheelchair-accessible" },
-                { title: "Airport Transfers", desc: "Reliable airport transport with flight monitoring, meet & greet services, luggage support and fixed-fare private transfers for individuals and groups.", slug: "airport-transfers" },
-                { title: "Event & Corporate Transport", desc: "Scalable transport solutions for conferences, workforce movement, executive travel, event logistics and guest transport coordination.", slug: "event-corporate" },
-                { title: "Logistics Transport", desc: "Flexible commercial transport for documents, parcels, scheduled business deliveries and time-sensitive logistics support.", slug: "logistics" },
-                { title: "Public Disruption Transport", desc: "Rapid-response transport solutions for rail replacement services, infrastructure works, emergency movement, event overflow transport and public network disruption support. Our flexible fleet and trained operators can support transport authorities, contractors and government agencies during planned or unexpected service interruptions.", slug: "rail-replacement" },
-                { title: "Vehicle Hire", desc: "Flexible vehicle hire solutions ranging from executive sedans and SUVs to accessible vans, minibuses and specialist transport fleet options.", slug: "vehicle-hire" }
-              ].map((service, idx) => (
-                <motion.a
-                  key={idx}
-                  href={`/services/${service.slug}`}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="group relative block overflow-hidden rounded-2xl sm:rounded-3xl bg-white/[0.02] border border-white/10 p-6 sm:p-8 md:p-10 hover:bg-white/[0.04] hover:border-white/20 transition-all duration-500 cursor-pointer outline-none"
-                >
-                  <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 md:gap-8">
-                    <div className="flex-1 max-w-lg">
-                      <div className="flex items-center gap-3 mb-2 sm:mb-4">
-                        <span className="text-[10px] sm:text-xs font-bold text-brand-orange/50 uppercase tracking-[0.2em]">0{idx + 1}</span>
-                      </div>
-                      <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-white mb-2 sm:mb-3 md:mb-4 tracking-tight group-hover:translate-x-2 transition-transform duration-500">{service.title}</h3>
-                      <p className="text-xs sm:text-sm md:text-base text-zinc-400 font-light leading-relaxed group-hover:translate-x-2 transition-transform duration-500 delay-75">{service.desc}</p>
-                    </div>
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 45 }}
-                      whileTap={{ scale: 1.1, rotate: 45 }}
-                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full border border-white/10 flex items-center justify-center text-white/50 group-hover:bg-brand-orange group-focus:bg-brand-orange group-hover:border-brand-orange group-hover:text-white transition-all duration-500 shrink-0 self-end sm:self-auto"
-                    >
-                      <iconify-icon icon="solar:arrow-right-up-linear" width="20" className="sm:w-[24px]"></iconify-icon>
-                    </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { title: "Chauffeur Services", desc: "Premium point-to-point transport for executives and VIP travel.", slug: "chauffeur", icon: "lucide:car" },
+              { title: "Wheelchair Transport", desc: "Safe mobility transport with trained accessibility support.", slug: "wheelchair-accessible", icon: "tabler:wheelchair" },
+              { title: "Airport Transfers", desc: "On-time airport pickup and drop-off with luggage assistance.", slug: "airport-transfers", icon: "lucide:plane" },
+              { title: "Event & Corporate Transport", desc: "Efficient transport for events, conferences and corporate travel.", slug: "event-corporate", icon: "lucide:building-2" },
+              { title: "Logistics Transport", desc: "Flexible transport support for operational and scheduled logistics.", slug: "logistics", icon: "lucide:package" },
+              { title: "Public Disruption Transport", desc: "Rapid-response transport during service disruptions and emergencies.", slug: "rail-replacement", icon: "lucide:bus" }
+            ].map((service, idx) => (
+              <motion.a
+                key={idx}
+                href={`/services/${service.slug}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="group flex flex-col p-8 md:p-10 bg-[#fafafa] hover:bg-white rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 border border-transparent hover:border-gray-100"
+              >
+                <div className="w-14 h-14 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange mb-8 transition-transform duration-500 group-hover:-translate-y-1">
+                  <iconify-icon icon={service.icon} width="28"></iconify-icon>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-[#050B14] mb-3">{service.title}</h3>
+                <p className="text-sm md:text-base text-gray-500 font-light leading-relaxed mb-8 flex-grow">{service.desc}</p>
+                <div className="flex items-center gap-2 text-brand-orange font-bold text-xs uppercase tracking-widest mt-auto group-hover:gap-3 transition-all duration-300">
+                  LEARN MORE
+                  <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Booking Process Section */}
+      <section className="py-16 md:py-24 bg-[#fafafa] relative border-b border-gray-100">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
+            <motion.span 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em] block mb-4"
+            >
+              BOOKING PROCESS
+            </motion.span>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-3xl sm:text-4xl md:text-5xl text-brand-blue font-bold tracking-tight"
+            >
+              Booking Made Simple in <span className="italic text-brand-orange font-medium">Under 2 Minutes</span>
+            </motion.h2>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8 relative">
+            <div className="hidden md:block absolute top-[45px] left-[12%] right-[12%] h-[2px] bg-gray-200 z-0"></div>
+
+            {[
+              { step: "01", title: "Choose Service", desc: "Select the transport service that suits your needs." },
+              { step: "02", title: "Share Details", desc: "Provide pickup, destination, time and requirements." },
+              { step: "03", title: "Get Your Quote", desc: "We confirm availability and provide a clear, transparent quote." },
+              { step: "04", title: "Ride Confirmed", desc: "Your ride is confirmed and a professional driver is dispatched." }
+            ].map((s, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="relative z-10 flex flex-col items-center text-center group"
+              >
+                <div className="w-24 h-24 rounded-full bg-[#fafafa] border-[6px] border-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center justify-center mb-8 relative group-hover:-translate-y-2 transition-transform duration-500">
+                  <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-2xl font-black text-brand-blue/20 group-hover:bg-brand-orange group-hover:text-white transition-colors duration-500">
+                    {s.step}
                   </div>
-                </motion.a>
-              ))}
-            </div>
+                </div>
+                <h3 className="text-lg md:text-xl font-bold text-brand-blue mb-3">{s.title}</h3>
+                <p className="text-sm text-gray-500 font-light leading-relaxed max-w-[240px]">{s.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -772,7 +758,7 @@ function Home() {
       </div>
 
       {/* Standards & Commitment Section */}
-      <section id="standards" data-header-theme="light" className="pt-4 pb-16 md:pt-6 md:pb-24 bg-white relative overflow-hidden">
+      <section id="standards" data-header-theme="light" className="py-16 md:py-24 bg-white relative">
         <div className="container mx-auto px-6 max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -787,7 +773,7 @@ function Home() {
             </div>
             <div className="max-w-3xl">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-brand-blue font-medium tracking-tight leading-[1.1]">
-                Built on trust. <span className="italic font-serif text-brand-orange">Backed by standards.</span>
+                Built on trust. <span className="italic text-brand-orange">Backed by standards.</span>
               </h2>
               <p className="mt-4 text-sm sm:text-base text-zinc-500 font-light leading-relaxed max-w-2xl">
                 Accredited operations, insured fleet, trained drivers and inclusive service — ready for corporate and government contracts.
@@ -797,12 +783,12 @@ function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[
-              { title: "Licensed & Accredited", desc: "Commercial transport compliance.", icon: "solar:shield-check-linear", dark: false },
-              { title: "Fully Insured Fleet", desc: "Passenger and commercial protection.", icon: "solar:shield-user-linear", dark: true },
-              { title: "Safety Compliant Vehicles", desc: "Regularly maintained fleet.", icon: "solar:settings-linear", dark: false },
-              { title: "Professional Drivers", desc: "Background checked and trained.", icon: "solar:user-id-linear", dark: false },
-              { title: "Accessibility Ready", desc: "Inclusive transport support.", icon: "solar:hand-heart-linear", dark: true },
-              { title: "Contract Ready", desc: "Corporate and government partnerships.", icon: "solar:document-text-linear", dark: false },
+              { title: "Licensed & Accredited", desc: "Commercial transport compliance.", icon: "lucide:shield-check", dark: false },
+              { title: "Fully Insured Fleet", desc: "Passenger and commercial protection.", icon: "lucide:shield", dark: true },
+              { title: "Safety Compliant Vehicles", desc: "Regularly maintained fleet.", icon: "lucide:settings", dark: false },
+              { title: "Professional Drivers", desc: "Background checked and trained.", icon: "lucide:user-check", dark: false },
+              { title: "Accessibility Ready", desc: "Inclusive transport support.", icon: "tabler:wheelchair", dark: true },
+              { title: "Contract Ready", desc: "Corporate and government partnerships.", icon: "lucide:file-text", dark: false },
             ].map((b, idx) => (
               <motion.div
                 key={idx}
@@ -829,7 +815,7 @@ function Home() {
 
 
       {/* Corporate & Government Solutions (PDF Section 4) */}
-      <section id="corporate" data-header-theme="dark" className="py-16 md:py-24 bg-brand-blue text-white relative overflow-hidden">
+      <section id="corporate" data-header-theme="dark" className="py-16 md:py-24 bg-brand-blue text-white relative">
         <div className="container mx-auto px-6 max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -904,7 +890,7 @@ function Home() {
             <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
               <div className="lg:col-span-5">
                 <h3 className="text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight leading-[1.15]">
-                  Government & Infrastructure <span className="italic font-serif text-brand-orange">Transport Solutions</span>
+                  Government & Infrastructure <span className="italic text-brand-orange">Transport Solutions</span>
                 </h3>
               </div>
               <div className="lg:col-span-7">
@@ -933,7 +919,7 @@ function Home() {
       </section>
 
       {/* Why Choose Us (PDF Section 6) */}
-      <section id="why-us" data-header-theme="light" className="py-16 md:py-24 bg-[#fafafa] relative overflow-hidden">
+      <section id="why-us" data-header-theme="light" className="py-16 md:py-24 bg-[#fafafa] relative">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             <motion.div
@@ -948,7 +934,7 @@ function Home() {
                 <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">Why Choose Us</span>
               </div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl text-brand-blue font-medium tracking-tight leading-[1.1]">
-                Specialist transport. <span className="italic font-serif text-brand-orange">Built for scale.</span>
+                Specialist transport. <span className="italic text-brand-orange">Built for scale.</span>
               </h2>
               <p className="mt-5 text-sm sm:text-base text-zinc-500 font-light leading-relaxed">
                 Trusted transport contractor across Australia for corporate, government, healthcare and infrastructure partners.
@@ -982,9 +968,9 @@ function Home() {
       </section>
 
       {/* Sectors Served Strip */}
-      <section data-header-theme="dark" className="bg-brand-blue text-white py-14 md:py-20 relative overflow-hidden">
+      <section data-header-theme="dark" className="bg-brand-blue text-white py-16 md:py-24 relative">
         <div className="container mx-auto px-6 max-w-7xl">
-          <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -997,7 +983,7 @@ function Home() {
                 <span className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em]">Sectors We Serve</span>
               </div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight leading-[1.1]">
-                Transport partner for <span className="italic font-serif text-brand-orange">operators, contractors, government.</span>
+                Transport partner for <span className="italic text-brand-orange">operators, contractors, government.</span>
               </h2>
               <p className="mt-5 text-sm sm:text-base text-white/60 font-light leading-relaxed max-w-xl">
                 Rail replacement transport, accessible mobility, corporate fleet and infrastructure project transport — delivered across Melbourne, Sydney, Brisbane, Perth and Adelaide.
@@ -1006,12 +992,12 @@ function Home() {
 
             <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               {[
-                { label: 'Transport Authorities', icon: 'solar:tram-linear' },
-                { label: 'Infrastructure Contractors', icon: 'solar:buildings-2-linear' },
-                { label: 'Government Agencies', icon: 'solar:shield-keyhole-linear' },
-                { label: 'Healthcare & NDIS', icon: 'solar:health-linear' },
-                { label: 'Corporate & Events', icon: 'solar:case-linear' },
-                { label: 'Aged Care Providers', icon: 'solar:users-group-rounded-linear' },
+                { label: 'Transport Authorities', icon: 'lucide:train' },
+                { label: 'Infrastructure Contractors', icon: 'lucide:building-2' },
+                { label: 'Government Agencies', icon: 'lucide:landmark' },
+                { label: 'Healthcare & NDIS', icon: 'lucide:heart-pulse' },
+                { label: 'Corporate & Events', icon: 'lucide:briefcase' },
+                { label: 'Aged Care Providers', icon: 'lucide:users' },
               ].map((s, i) => (
                 <motion.div
                   key={i}
@@ -1061,8 +1047,7 @@ function Home() {
                 <div>
                   <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1 sm:mb-2 md:mb-3">Headquarters</p>
                   <p className="text-xs sm:text-sm md:text-lg text-zinc-600 font-light">
-                    8 Langridge Drive<br />
-                    Epping VIC 3076
+                    Melbourne, VIC
                   </p>
                 </div>
               </div>
@@ -1340,6 +1325,66 @@ function Home() {
         </div>
       </section>
 
+      {/* FAQ SECTION */}
+      <section className="py-16 md:py-24 bg-[#fafafa] border-t border-gray-100 relative">
+        <div className="container mx-auto px-6 max-w-3xl">
+          <div className="text-center mb-12 md:mb-16">
+            <span className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em] block mb-4">FAQ</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl text-brand-blue font-bold tracking-tight">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {[
+              { q: "Do you offer 24/7 transport services?", a: "Yes, our dispatch team operates 24/7 for scheduled and urgent bookings." },
+              { q: "Are your vehicles wheelchair accessible?", a: "Yes, we have accessibility-equipped vehicles with trained drivers." },
+              { q: "Do you provide airport transfers?", a: "Yes, we provide reliable airport pickup and drop-off services across Victoria." }
+            ].map((faq, i) => (
+              <details key={i} className="group bg-white border border-gray-100 rounded-2xl cursor-pointer hover:shadow-md transition-shadow">
+                <summary className="flex items-center justify-between p-6 font-bold text-brand-blue hover:text-brand-orange transition-colors list-none [&::-webkit-details-marker]:hidden">
+                  <span className="pr-6">{faq.q}</span>
+                  <span className="transition-transform duration-300 group-open:rotate-180 flex-shrink-0 text-brand-orange">
+                    <iconify-icon icon="solar:alt-arrow-down-linear" width="20"></iconify-icon>
+                  </span>
+                </summary>
+                <div className="p-6 pt-0 text-gray-500 font-light leading-relaxed">
+                  {faq.a}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA SECTION */}
+      <section className="py-20 md:py-32 bg-brand-blue relative text-center text-white">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-brand-orange/10 blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="container mx-auto px-6 max-w-4xl relative z-10">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+            Need Transport Support Today?
+          </h2>
+          <p className="text-white/70 font-light text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-10">
+            Our team is available 24/7 to assist with urgent, scheduled and specialist transport requirements.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <a
+              href="tel:0411099994"
+              className="inline-flex items-center justify-center gap-3 bg-white text-brand-blue hover:bg-gray-100 px-8 py-4 rounded-xl transition-all duration-300 font-bold text-xs uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-xl"
+            >
+              CALL DISPATCH NOW
+              <iconify-icon icon="solar:phone-calling-linear" width="16"></iconify-icon>
+            </a>
+            <a
+              href="#contact"
+              className="inline-flex items-center justify-center gap-3 bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-4 rounded-xl transition-all duration-300 font-bold text-xs uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-xl"
+            >
+              GET A QUOTE NOW
+              <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Monumental Minimal Footer */}
       <Footer />
     </>
@@ -1472,7 +1517,7 @@ function QuickContact() {
         className="group w-12 h-12 rounded-full bg-white text-[#25D366] border border-zinc-200 flex items-center justify-center shadow-md hover:shadow-lg hover:bg-[#25D366] hover:text-white hover:border-[#25D366] transition-all duration-300"
       >
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.15-.174.2-.298.299-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488"/>
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.15-.174.2-.298.299-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488" />
         </svg>
       </a>
       <a
@@ -1481,7 +1526,7 @@ function QuickContact() {
         className="group w-12 h-12 rounded-full bg-white text-brand-blue border border-zinc-200 flex items-center justify-center shadow-md hover:shadow-lg hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all duration-300"
       >
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
         </svg>
       </a>
     </div>
@@ -1527,7 +1572,7 @@ function StickyMobileBook() {
             className="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center shrink-0 active:bg-white/20"
           >
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
             </svg>
           </a>
           <a
@@ -1538,7 +1583,7 @@ function StickyMobileBook() {
             className="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0 active:bg-[#1ebe5d]"
           >
             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.15-.174.2-.298.299-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488"/>
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.15-.174.2-.298.299-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.464 3.488" />
             </svg>
           </a>
           <a

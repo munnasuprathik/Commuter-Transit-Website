@@ -38,12 +38,22 @@ export function Footer() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="md:col-span-5"
           >
-            <div className="h-36 sm:h-40 md:h-36 lg:h-40 mb-6 -ml-3">
+            <div className="h-28 sm:h-32 md:h-28 lg:h-32 mb-6 -ml-3">
               <img src="/images/CT LOGO WHITE.png" alt="Commuter Transit Logo" className="h-full w-auto object-contain" />
             </div>
-            <p className="text-white/70 font-light text-sm max-w-sm leading-relaxed mb-6">
-              Specialist transport and mobility solutions across Australia — chauffeur services, wheelchair accessible transport, airport transfers, corporate mobility, logistics, rail replacement and fleet hire.
+            <p className="text-white/70 font-light text-sm max-w-sm leading-relaxed mb-8">
+              Safe, accessible and reliable transport solutions across Victoria, available 24/7.
             </p>
+            <div className="mb-8">
+              <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-medium mb-3">Coverage Areas</h3>
+              <ul className="text-sm text-white/80 font-light space-y-2">
+                <li>Melbourne Metro</li>
+                <li>Outer Suburbs</li>
+                <li>Regional Victoria</li>
+                <li>Airport Transfers</li>
+                <li>Specialist Transport</li>
+              </ul>
+            </div>
             <p className="text-[10px] font-medium text-white/40 uppercase tracking-[0.2em]">H&A Global Aus Pty Ltd</p>
           </motion.div>
 
@@ -81,7 +91,7 @@ export function Footer() {
                 <a href="tel:0411099994" className="text-sm text-white/80 hover:text-brand-orange transition-colors">0411 099 994</a>
               </li>
               <li>
-                <span className="text-sm text-white/60 leading-relaxed block">8 Langridge Drive<br />Epping VIC 3076</span>
+                <span className="text-sm text-white/60 leading-relaxed block">Melbourne, VIC</span>
               </li>
             </ul>
           </motion.div>

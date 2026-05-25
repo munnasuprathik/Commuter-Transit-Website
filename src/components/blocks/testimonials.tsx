@@ -36,7 +36,7 @@ const TESTIMONIALS = [
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="bg-brand-blue py-16 md:py-24 relative overflow-hidden">
+    <section id="testimonials" className="hidden bg-brand-blue py-16 md:py-24 relative overflow-hidden">
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-24">
           <motion.div 
@@ -53,7 +53,7 @@ export function TestimonialsSection() {
               </div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white tracking-tight font-medium leading-[1.1]">
                 Trusted by <br />
-                <span className="text-brand-orange italic font-serif">Industry Leaders.</span>
+                <span className="text-brand-orange italic">Industry Leaders.</span>
               </h2>
             </div>
             <p className="text-sm sm:text-base md:text-lg text-white/70 font-light leading-relaxed">
