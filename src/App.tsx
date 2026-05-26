@@ -87,7 +87,7 @@ function Home() {
   ];
 
   const fuse = new Fuse(melbourneLocations, {
-    threshold: 0.4,
+    threshold: 0.15,
     distance: 100,
     ignoreLocation: true,
     minMatchCharLength: 2
@@ -111,25 +111,6 @@ function Home() {
     setFormData(prev => ({ ...prev, [fieldId]: value }));
     if (errors[fieldId]) {
       setErrors(prev => ({ ...prev, [fieldId]: '' }));
-    }
-
-    // Handle location suggestions
-    if (fieldId === 'fromLocation') {
-      if (value.length > 1) {
-        const results = fuse.search(value);
-        setFromSuggestions(results.map(r => r.item));
-      } else {
-        setFromSuggestions([]);
-      }
-    }
-
-    if (fieldId === 'toLocation') {
-      if (value.length > 1) {
-        const results = fuse.search(value);
-        setToSuggestions(results.map(r => r.item));
-      } else {
-        setToSuggestions([]);
-      }
     }
   };
 
@@ -367,13 +348,13 @@ function Home() {
         {/* Main Navigation */}
         <div className="bg-transparent w-full transition-all duration-300">
           <div className="container mx-auto px-6 max-w-7xl">
-            <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? 'h-16 md:h-20' : 'h-20 md:h-24'}`}>
+            <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? 'h-16 md:h-20' : 'h-24 md:h-32'}`}>
               {/* Logo */}
               <a href="/" className="flex-shrink-0 flex items-center h-full">
                 <img
                   src="/images/CT LOGO WHITE.png"
                   alt="Commuter Transit Logo"
-                  className="h-10 md:h-14 w-auto object-contain transition-all duration-300"
+                  className="h-20 md:h-28 w-auto object-contain transition-all duration-300"
                 />
               </a>
 
@@ -1021,11 +1002,11 @@ function Home() {
 
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {[
-                { title: '24/7 Availability', desc: 'Round-the-clock dispatch for planned and emergency transport.' },
-                { title: 'Flexible Fleet', desc: 'Sedans to mini buses scaled to job requirements.' },
-                { title: 'Rapid Deployment', desc: 'Fast mobilisation for rail replacement and disruption work.' },
-                { title: 'Transport Specialists', desc: 'Trained operators across accessible, corporate and logistics transport.' },
-                { title: 'Customer-First Support', desc: 'Direct account contact for contracts and recurring bookings.' },
+                { title: '24/7 Availability', desc: 'Round-the-clock dispatch for planned and emergency transport.', icon: 'solar:clock-circle-bold-duotone' },
+                { title: 'Flexible Fleet', desc: 'Sedans to mini buses scaled to job requirements.', icon: 'solar:bus-bold-duotone' },
+                { title: 'Rapid Deployment', desc: 'Fast mobilisation for rail replacement and disruption work.', icon: 'solar:rocket-bold-duotone' },
+                { title: 'Transport Specialists', desc: 'Trained operators across accessible, corporate and logistics transport.', icon: 'solar:user-id-bold-duotone' },
+                { title: 'Customer-First Support', desc: 'Direct account contact for contracts and recurring bookings.', icon: 'solar:phone-calling-bold-duotone' },
               ].map((item, idx) => (
                 <motion.div
                   key={idx}
@@ -1035,7 +1016,7 @@ function Home() {
                   transition={{ duration: 0.5, delay: idx * 0.06 }}
                   className="bg-white border border-zinc-100 rounded-2xl p-5 sm:p-6 hover:border-brand-orange/40 hover:shadow-sm transition-all duration-300"
                 >
-                  <span className="text-[10px] font-bold text-brand-orange tracking-[0.25em] tabular-nums">0{idx + 1}</span>
+                  <iconify-icon icon={item.icon} className="text-3xl text-brand-orange mb-2"></iconify-icon>
                   <h3 className="mt-3 text-base sm:text-lg font-medium text-brand-blue tracking-tight">{item.title}</h3>
                   <p className="mt-1.5 text-xs sm:text-sm text-zinc-500 font-light leading-relaxed">{item.desc}</p>
                 </motion.div>
@@ -1106,7 +1087,7 @@ function Home() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="mb-10 md:mb-14">
-                <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">CTA / Contact</span>
+                <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.3em]">Contact</span>
               </div>
 
               <div className="space-y-6 sm:space-y-8 md:space-y-10">
@@ -1434,34 +1415,7 @@ function Home() {
         </div>
       </section>
 
-      {/* FINAL CTA SECTION */}
-      <section className="py-20 md:py-32 bg-brand-blue relative text-center text-white">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-brand-orange/10 blur-[120px] rounded-full pointer-events-none"></div>
-        <div className="container mx-auto px-6 max-w-4xl relative z-10">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-            Need Transport Support Today?
-          </h2>
-          <p className="text-white/70 font-light text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-10">
-            Our team is available 24/7 to assist with urgent, scheduled and specialist transport requirements.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a
-              href="tel:0411099994"
-              className="inline-flex items-center justify-center gap-3 bg-white text-brand-blue hover:bg-gray-100 px-8 py-4 rounded-xl transition-all duration-300 font-bold text-xs uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-xl"
-            >
-              CALL DISPATCH NOW
-              <iconify-icon icon="solar:phone-calling-linear" width="16"></iconify-icon>
-            </a>
-            <a
-              href="#contact"
-              className="inline-flex items-center justify-center gap-3 bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-4 rounded-xl transition-all duration-300 font-bold text-xs uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-xl"
-            >
-              GET A QUOTE NOW
-              <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
-            </a>
-          </div>
-        </div>
-      </section>
+
 
       {/* Monumental Minimal Footer */}
       <Footer />
@@ -1776,4 +1730,5 @@ export default function App() {
     </>
   );
 }
+
 

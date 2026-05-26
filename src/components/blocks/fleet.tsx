@@ -37,10 +37,7 @@ export function FleetSection() {
               Our vehicles are equipped for safety, accessibility and reliability on every journey.
             </p>
             
-            <a href="#contact" className="inline-flex items-center justify-center gap-3 bg-brand-blue hover:bg-brand-blue-light text-white px-8 py-4 rounded-xl transition-all duration-300 font-bold text-xs uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-xl">
-              VIEW OUR FLEET
-              <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
-            </a>
+            
           </motion.div>
 
           {/* Right Side: Grid Layout */}
@@ -89,3 +86,4 @@ export function FleetSection() {
     </section>
   );
 }
+

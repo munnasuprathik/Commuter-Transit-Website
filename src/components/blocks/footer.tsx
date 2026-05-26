@@ -54,7 +54,7 @@ export function Footer() {
                 <li>Specialist Transport</li>
               </ul>
             </div>
-            <p className="text-[10px] font-medium text-white/40 uppercase tracking-[0.2em]">H&A Global Aus Pty Ltd</p>
+            
           </motion.div>
 
           <motion.div
@@ -143,3 +143,4 @@ export function Footer() {
     </footer>
   );
 }
+
