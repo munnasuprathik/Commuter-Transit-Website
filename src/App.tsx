@@ -84,10 +84,6 @@ function Home() {
     } else if (bookingStep === 2) {
       if (!formData.pickupDate) newErrors.pickupDate = 'Date required.';
       if (!formData.pickupTime) newErrors.pickupTime = 'Time required.';
-      if (formData.tripType === 'return') {
-        if (!formData.returnDate) newErrors.returnDate = 'Return date required.';
-        if (!formData.returnTime) newErrors.returnTime = 'Return time required.';
-      }
     }
 
     setErrors(newErrors);
@@ -1103,7 +1099,7 @@ function Home() {
                             <p className="text-sm text-brand-blue font-medium">{submittedData.toLocation}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">{submittedData.tripType === 'return' ? 'Departure' : 'Date & Time'}</p>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Date & Time</p>
                             <p className="text-sm text-brand-blue font-medium">{submittedData.pickupDate} at {submittedData.pickupTime}</p>
                           </div>
                           <div>
@@ -1111,19 +1107,9 @@ function Home() {
                             <p className="text-sm text-brand-blue font-medium capitalize">{submittedData.service.replace('-', ' ')}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Trip Type</p>
-                            <p className="text-sm text-brand-blue font-medium capitalize">{submittedData.tripType === 'return' ? 'Return Trip' : 'One Way'}</p>
-                          </div>
-                          <div>
                             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Driver</p>
                             <p className="text-sm text-brand-blue font-medium capitalize">{(submittedData.driverOption || 'with-driver').replace('-', ' ')}</p>
                           </div>
-                          {submittedData.tripType === 'return' && (
-                            <div>
-                              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Return</p>
-                              <p className="text-sm text-brand-blue font-medium">{submittedData.returnDate} at {submittedData.returnTime}</p>
-                            </div>
-                          )}
                         </div>
                       </div>
                     )}
@@ -1230,26 +1216,6 @@ function Home() {
                                 exit={{ opacity: 0, x: -20 }}
                                 className="space-y-8"
                               >
-                                {/* Trip Type Toggle */}
-                                <div>
-                                  <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Trip Type</span>
-                                  <div className="flex gap-2 p-1.5 bg-zinc-100/60 rounded-xl">
-                                    {[
-                                      { val: 'one-way', label: 'One Way' },
-                                      { val: 'return', label: 'Return Trip' },
-                                    ].map((opt) => (
-                                      <button
-                                        key={opt.val}
-                                        type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, tripType: opt.val }))}
-                                        className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${formData.tripType === opt.val ? 'bg-white text-brand-blue shadow-sm' : 'text-zinc-400 hover:text-zinc-600'}`}
-                                      >
-                                        {opt.label}
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-
                                 {/* Driver Preference Dropdown */}
                                 <div className="relative">
                                   <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Driver Option</span>
@@ -1266,29 +1232,15 @@ function Home() {
 
                                 <div className="relative">
                                   <input type="date" id="pickupDate" value={formData.pickupDate} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} className={`w-full bg-transparent border-b ${errors.pickupDate ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
-                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{formData.tripType === 'return' ? 'Departure Date *' : 'Pickup Date *'}</span>
+                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Pickup Date *</span>
                                   {errors.pickupDate && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.pickupDate}</span>}
                                 </div>
                                 <div className="relative">
                                   <input type="time" id="pickupTime" value={formData.pickupTime} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.pickupTime ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
-                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{formData.tripType === 'return' ? 'Departure Time *' : 'Pickup Time *'}</span>
+                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Pickup Time *</span>
                                   {errors.pickupTime && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.pickupTime}</span>}
                                 </div>
 
-                                {formData.tripType === 'return' && (
-                                  <>
-                                    <div className="relative">
-                                      <input type="date" id="returnDate" value={formData.returnDate} onChange={handleInputChange} min={formData.pickupDate || new Date().toISOString().split('T')[0]} className={`w-full bg-transparent border-b ${errors.returnDate ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
-                                      <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Return Date *</span>
-                                      {errors.returnDate && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.returnDate}</span>}
-                                    </div>
-                                    <div className="relative">
-                                      <input type="time" id="returnTime" value={formData.returnTime} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.returnTime ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
-                                      <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Return Time *</span>
-                                      {errors.returnTime && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.returnTime}</span>}
-                                    </div>
-                                  </>
-                                )}
                                 <div className="flex gap-4">
                                   <button type="button" onClick={prevStep} className="flex-1 py-4 border border-zinc-200 text-brand-blue text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-50 transition-colors">Back</button>
                                   <button type="button" onClick={nextStep} className="flex-1 py-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-orange-light transition-colors">Next Step</button>

@@ -375,15 +375,9 @@ export function AdminDashboard() {
                           </td>
                           <td className="px-6 py-4">
                             <div className="text-xs text-zinc-700">{booking.pickup_date}</div>
-                            {booking.trip_type === 'return' && (
-                              <div className="text-[10px] text-brand-orange font-bold uppercase tracking-widest mt-1">↩ Return: {booking.return_date}</div>
-                            )}
                           </td>
                           <td className="px-6 py-4">
                             <div className="text-xs text-zinc-700">{booking.pickup_time}</div>
-                            {booking.trip_type === 'return' && booking.return_time && (
-                              <div className="text-[10px] text-brand-orange mt-1">{booking.return_time}</div>
-                            )}
                           </td>
                           <td className="px-6 py-4">
                             <div className="inline-block px-2 py-1 bg-brand-blue/5 rounded text-[10px] font-bold uppercase tracking-widest text-brand-blue">
