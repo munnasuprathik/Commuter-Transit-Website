@@ -38,8 +38,8 @@ export function Footer() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="md:col-span-5"
           >
-            <div className="h-28 sm:h-32 md:h-28 lg:h-32 mb-6 -ml-3">
-              <img src="/images/CT LOGO WHITE.png" alt="Commuter Transit Logo" className="h-full w-auto object-contain" />
+            <div className="h-20 sm:h-24 md:h-28 lg:h-32 mb-6">
+              <img src="/images/CT LOGO WHITE.png" alt="Commuter Transit Logo" className="h-full w-auto object-contain object-left scale-[1.35] origin-left" />
             </div>
             <p className="text-white/70 font-light text-sm max-w-sm leading-relaxed mb-8">
               Safe, accessible and reliable transport solutions across Victoria, available 24/7.
@@ -71,7 +71,8 @@ export function Footer() {
               <li><a href="/#corporate" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Corporate & Government</a></li>
               <li><a href="/#standards" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Compliance</a></li>
               <li><a href="/#why-us" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Why Us</a></li>
-              <li><a href="/#contact" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Book · Quote</a></li>
+              <li><a href="/#contact" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Book</a></li>
+              <li><a href="/#contact" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Contact</a></li>
             </ul>
           </motion.div>
 
