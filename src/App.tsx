@@ -348,13 +348,13 @@ function Home() {
         {/* Main Navigation */}
         <div className="bg-transparent w-full transition-all duration-300">
           <div className="container mx-auto px-6 max-w-7xl">
-            <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? 'h-16 md:h-20' : 'h-24 md:h-32'}`}>
+            <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? 'h-20 md:h-20' : 'h-28 md:h-32'}`}>
               {/* Logo */}
               <a href="/" className="flex-shrink-0 flex items-center h-full">
                 <img
                   src="/images/CT LOGO WHITE.png"
                   alt="Commuter Transit Logo"
-                  className="h-20 md:h-28 w-auto object-contain transition-all duration-300"
+                  className="h-24 md:h-28 w-auto object-contain transition-all duration-300"
                 />
               </a>
 
