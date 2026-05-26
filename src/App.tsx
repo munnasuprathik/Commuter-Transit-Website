@@ -537,9 +537,9 @@ function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="text-xs md:text-sm font-bold text-brand-orange uppercase tracking-[0.2em] mb-6"
+                className="text-[11px] md:text-xs font-bold text-brand-orange uppercase tracking-[0.1em] leading-relaxed mb-6 max-w-2xl"
               >
-                Trusted by individuals, hospitals, businesses & communities across Victoria
+                Trusted by individuals, hospitals, businesses &amp; communities across Victoria
               </motion.p>
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
