@@ -24,7 +24,7 @@ export function Footer() {
             whileTap={{ scale: 0.97 }}
             className="group inline-flex items-center gap-3 bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-4 rounded-full transition-colors shrink-0"
           >
-            <span className="text-xs font-medium uppercase tracking-[0.2em]">Book Now</span>
+            <span className="text-xs font-medium uppercase tracking-[0.2em]">Quote Now</span>
             <iconify-icon icon="solar:arrow-right-up-linear" width="16" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></iconify-icon>
           </motion.a>
         </motion.div>
@@ -71,7 +71,7 @@ export function Footer() {
               <li><a href="/#corporate" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Corporate & Government</a></li>
               <li><a href="/#standards" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Compliance</a></li>
               <li><a href="/#why-us" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Why Us</a></li>
-              <li><a href="/#contact" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Book</a></li>
+              <li><a href="/#contact" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Quote</a></li>
               <li><a href="/#contact" className="text-sm text-white/80 hover:text-brand-orange transition-colors">Contact</a></li>
             </ul>
           </motion.div>

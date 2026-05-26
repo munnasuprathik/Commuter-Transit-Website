@@ -4,9 +4,8 @@
  */
 
 import React, { useEffect, useRef, useState, FormEvent } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import Fuse from 'fuse.js';
 import './types.d.ts';
 import { FleetSection } from './components/blocks/fleet';
 import { Footer } from './components/blocks/footer';
@@ -20,6 +19,7 @@ import { Toaster, toast } from 'sonner';
 import { Typewriter } from './components/ui/typewriter';
 import { MagneticButton } from './components/ui/magnetic-button';
 import { TextReveal } from './components/ui/text-reveal';
+import { LocationAutocomplete } from './components/ui/location-autocomplete';
 
 function Home() {
   const COMPANY_PHONE = '0411 099 994'; // Updated company phone number
@@ -35,14 +35,15 @@ function Home() {
     pickupTime: '',
     driverOption: 'with-driver',
     service: '',
-    message: ''
+    message: '',
+    tripType: 'one-way',
+    returnDate: '',
+    returnTime: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [submittedData, setSubmittedData] = useState<typeof formData | null>(null);
   const [bookingReference, setBookingReference] = useState<string>('');
-  const [fromSuggestions, setFromSuggestions] = useState<string[]>([]);
-  const [toSuggestions, setToSuggestions] = useState<string[]>([]);
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -50,48 +51,6 @@ function Home() {
 
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 1000], [0, 300]);
-
-
-  const melbourneLocations = [
-    'Melbourne Airport (MEL)',
-    'Melbourne CBD',
-    'Southbank, Melbourne',
-    'Docklands, Melbourne',
-    'St Kilda, Melbourne',
-    'Richmond, Melbourne',
-    'South Yarra, Melbourne',
-    'Fitzroy, Melbourne',
-    'Carlton, Melbourne',
-    'Brunswick, Melbourne',
-    'Footscray, Melbourne',
-    'Box Hill, Melbourne',
-    'Glen Waverley, Melbourne',
-    'Dandenong, Melbourne',
-    'Frankston, Melbourne',
-    'Geelong, Victoria',
-    'Mornington Peninsula',
-    'Yarra Valley',
-    'Phillip Island',
-    'Great Ocean Road',
-    'Melborne CBD',
-    'Tullamarine Airport',
-    'Avalon Airport',
-    'Southern Cross Station',
-    'Flinders Street Station',
-    'MCG (Melbourne Cricket Ground)',
-    'Marvel Stadium',
-    'St Kilda Beach',
-    'Chadstone Shopping Centre',
-    'Chaddy',
-    'The G'
-  ];
-
-  const fuse = new Fuse(melbourneLocations, {
-    threshold: 0.15,
-    distance: 100,
-    ignoreLocation: true,
-    minMatchCharLength: 2
-  });
 
   const servicesAvailability: Record<string, boolean> = {
     'chauffeur': true,
@@ -114,35 +73,6 @@ function Home() {
     }
   };
 
-  const selectSuggestion = (field: 'fromLocation' | 'toLocation', value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (field === 'fromLocation') setFromSuggestions([]);
-    if (field === 'toLocation') setToSuggestions([]);
-
-    // Clear error when a valid suggestion is selected
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-
-    // Blur the input to hide keyboard on mobile and signal selection
-    const element = document.getElementById(field);
-    if (element) {
-      (element as HTMLInputElement).blur();
-    }
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('.location-input-container')) {
-        setFromSuggestions([]);
-        setToSuggestions([]);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const nextStep = () => {
     const newErrors: Record<string, string> = {};
@@ -154,6 +84,10 @@ function Home() {
     } else if (bookingStep === 2) {
       if (!formData.pickupDate) newErrors.pickupDate = 'Date required.';
       if (!formData.pickupTime) newErrors.pickupTime = 'Time required.';
+      if (formData.tripType === 'return') {
+        if (!formData.returnDate) newErrors.returnDate = 'Return date required.';
+        if (!formData.returnTime) newErrors.returnTime = 'Return time required.';
+      }
     }
 
     setErrors(newErrors);
@@ -214,7 +148,7 @@ function Home() {
         setBookingStep(1);
 
         toast.success(
-          activeTab === 'booking' ? 'Booking confirmed' : 'Message received',
+          activeTab === 'booking' ? 'Quote request received' : 'Message received',
           {
             description: activeTab === 'booking'
               ? `Reference ${reference}. Our team will contact you shortly.`
@@ -233,7 +167,10 @@ function Home() {
           pickupTime: '',
           driverOption: 'with-driver',
           service: '',
-          message: ''
+          message: '',
+          tripType: 'one-way',
+          returnDate: '',
+          returnTime: ''
         });
       } catch (error) {
         console.error('Error submitting booking:', error);
@@ -378,13 +315,13 @@ function Home() {
                 ))}
               </nav>
 
-              {/* Book Now Button */}
+              {/* Quote Now Button */}
               <div className="hidden lg:flex items-center">
                 <a
                   href="#contact"
                   className="bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-3 text-sm font-bold tracking-widest rounded-md flex items-center gap-2 transition-colors uppercase shadow-md"
                 >
-                  BOOK NOW
+                  QUOTE NOW
                 </a>
               </div>
 
@@ -438,7 +375,7 @@ function Home() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="mt-8 mx-auto inline-flex items-center justify-center bg-brand-orange text-white px-10 py-4 rounded-md hover:bg-brand-orange-light transition-colors w-full max-w-xs"
               >
-                <span className="text-sm font-bold uppercase tracking-widest">Book Now</span>
+                <span className="text-sm font-bold uppercase tracking-widest">Quote Now</span>
               </motion.a>
             </nav>
           </motion.div>
@@ -474,7 +411,7 @@ function Home() {
 
               <div className="flex flex-wrap items-center gap-4">
                 <a href="#contact" onClick={() => { setActiveTab('booking'); setBookingStep(1); }} className="bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-3.5 text-xs md:text-sm font-bold tracking-widest rounded-md uppercase transition-colors shadow-lg">
-                  BOOK TRANSPORT
+                  GET A QUOTE
                 </a>
                 <a href="tel:0411099994" className="bg-transparent border border-white text-white hover:bg-white hover:text-black px-8 py-3.5 text-xs md:text-sm font-bold tracking-widest rounded-md flex items-center gap-2 uppercase transition-colors">
                   <iconify-icon icon="solar:phone-calling-linear" width="18" className="text-brand-orange"></iconify-icon>
@@ -494,25 +431,21 @@ function Home() {
                 <div className="space-y-4 relative z-10">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide">Pickup Location *</label>
-                    <input
-                      type="text"
-                      name="fromLocation"
+                    <LocationAutocomplete
+                      id="fromLocation"
                       value={formData.fromLocation}
-                      onChange={handleInputChange}
+                      onChange={(v) => setFormData(prev => ({ ...prev, fromLocation: v }))}
                       placeholder="Enter pickup address"
-                      className="w-full bg-white border border-gray-300 rounded-md px-4 py-3.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent text-sm placeholder:text-gray-400"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide">Destination *</label>
-                    <input
-                      type="text"
-                      name="toLocation"
+                    <LocationAutocomplete
+                      id="toLocation"
                       value={formData.toLocation}
-                      onChange={handleInputChange}
+                      onChange={(v) => setFormData(prev => ({ ...prev, toLocation: v }))}
                       placeholder="Enter destination"
-                      className="w-full bg-white border border-gray-300 rounded-md px-4 py-3.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent text-sm placeholder:text-gray-400"
                     />
                   </div>
 
@@ -552,7 +485,7 @@ function Home() {
                     }}
                     className="w-full bg-brand-orange hover:bg-brand-orange-light text-white font-bold py-4 rounded-md transition-colors mt-4 text-sm tracking-widest uppercase shadow-md flex justify-center items-center gap-2"
                   >
-                    BOOK NOW
+                    QUOTE NOW
                     <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
                   </button>
 
@@ -768,7 +701,7 @@ function Home() {
               viewport={{ once: true }}
               className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em] block mb-4"
             >
-              BOOKING PROCESS
+              QUOTE PROCESS
             </motion.span>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -777,7 +710,7 @@ function Home() {
               transition={{ delay: 0.1 }}
               className="text-3xl sm:text-4xl md:text-5xl text-brand-blue font-bold tracking-tight"
             >
-              Booking Made Simple in <span className="italic text-brand-orange font-medium">Under 2 Minutes</span>
+              Requesting a Quote Made Simple in <span className="italic text-brand-orange font-medium">Under 2 Minutes</span>
             </motion.h2>
           </div>
 
@@ -1126,7 +1059,7 @@ function Home() {
                     onClick={() => setActiveTab('booking')}
                     className={`flex-1 py-3 sm:py-3.5 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all duration-300 ${activeTab === 'booking' ? 'bg-white text-brand-blue shadow-sm' : 'text-zinc-400 hover:text-zinc-600'}`}
                   >
-                    Book Transport
+                    Get a Quote
                   </button>
                   <button
                     onClick={() => setActiveTab('contact')}
@@ -1153,7 +1086,7 @@ function Home() {
                         <iconify-icon icon="solar:check-read-linear" width="32" className="md:w-[40px]"></iconify-icon>
                       </motion.div>
                       <h3 className="text-2xl md:text-3xl font-medium text-brand-blue mb-2 tracking-tight">
-                        {submittedData.service ? 'Booking Confirmed' : 'Request Received'}
+                        {submittedData.service ? 'Quote Request Received' : 'Request Received'}
                       </h3>
                       <p className="text-zinc-500 text-sm font-light">Reference: <span className="text-brand-blue font-bold tracking-widest">{bookingReference}</span></p>
                     </div>
@@ -1170,34 +1103,34 @@ function Home() {
                             <p className="text-sm text-brand-blue font-medium">{submittedData.toLocation}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Date & Time</p>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">{submittedData.tripType === 'return' ? 'Departure' : 'Date & Time'}</p>
                             <p className="text-sm text-brand-blue font-medium">{submittedData.pickupDate} at {submittedData.pickupTime}</p>
                           </div>
                           <div>
                             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Service</p>
                             <p className="text-sm text-brand-blue font-medium capitalize">{submittedData.service.replace('-', ' ')}</p>
                           </div>
+                          <div>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Trip Type</p>
+                            <p className="text-sm text-brand-blue font-medium capitalize">{submittedData.tripType === 'return' ? 'Return Trip' : 'One Way'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Driver</p>
+                            <p className="text-sm text-brand-blue font-medium capitalize">{(submittedData.driverOption || 'with-driver').replace('-', ' ')}</p>
+                          </div>
+                          {submittedData.tripType === 'return' && (
+                            <div>
+                              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Return</p>
+                              <p className="text-sm text-brand-blue font-medium">{submittedData.returnDate} at {submittedData.returnTime}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
 
-                    <div className="text-left mb-10 md:mb-14">
-                      <h4 className="text-[10px] font-bold text-brand-blue uppercase tracking-widest mb-4">Next Steps</h4>
-                      <ul className="space-y-4">
-                        {[
-                          { icon: "solar:letter-linear", text: "A confirmation email has been sent to your inbox." },
-                          { icon: "solar:phone-calling-linear", text: "One of our team members will contact you shortly." },
-                          { icon: "solar:user-id-linear", text: "Chauffeur details will be sent to you before pickup (for bookings)." },
-                          { icon: "solar:card-2-linear", text: "Payment link will be provided upon trip completion." }
-                        ].map((step, i) => (
-                          <li key={i} className="flex items-start gap-4">
-                            <div className="w-8 h-8 rounded-full bg-white border border-zinc-100 flex items-center justify-center text-brand-blue shrink-0">
-                              <iconify-icon icon={step.icon} width="16"></iconify-icon>
-                            </div>
-                            <p className="text-xs md:text-sm text-zinc-500 font-light leading-relaxed">{step.text}</p>
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="flex items-center justify-center gap-3 mb-10 md:mb-12 p-4 bg-zinc-50 border border-zinc-100 rounded-2xl">
+                      <iconify-icon icon="solar:phone-calling-rounded-linear" width="20" className="text-brand-orange shrink-0"></iconify-icon>
+                      <p className="text-sm text-zinc-600 font-light">Our team will contact you shortly to confirm the details.</p>
                     </div>
 
                     <div className="text-center">
@@ -1214,18 +1147,26 @@ function Home() {
                   <div className="space-y-8">
                     {/* Wizard Progress */}
                     {activeTab === 'booking' && (
-                      <div className="flex items-center justify-between mb-12">
-                        {[1, 2, 3].map((step) => (
-                          <div key={step} className="flex flex-col items-center gap-2">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-500 ${bookingStep >= step ? 'bg-brand-orange text-white' : 'bg-zinc-100 text-zinc-400'}`}>
-                              {bookingStep > step ? <iconify-icon icon="solar:check-read-linear" width="14"></iconify-icon> : step}
+                      <div className="relative mb-12">
+                        {/* Track line */}
+                        <div className="absolute top-4 left-[16%] right-[16%] h-0.5 bg-zinc-100"></div>
+                        {/* Filled line */}
+                        <div
+                          className="absolute top-4 left-[16%] h-0.5 bg-brand-orange transition-all duration-500"
+                          style={{ width: `${((bookingStep - 1) / 2) * 68}%` }}
+                        ></div>
+                        <div className="relative flex items-start justify-between">
+                          {[1, 2, 3].map((step) => (
+                            <div key={step} className="flex flex-col items-center gap-2 z-10">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-500 ${bookingStep >= step ? 'bg-brand-orange text-white' : 'bg-white border-2 border-zinc-200 text-zinc-400'}`}>
+                                {bookingStep > step ? <iconify-icon icon="solar:check-read-linear" width="14"></iconify-icon> : step}
+                              </div>
+                              <span className={`text-[8px] uppercase tracking-widest font-bold transition-colors duration-500 ${bookingStep >= step ? 'text-brand-blue' : 'text-zinc-400'}`}>
+                                {step === 1 ? 'Route' : step === 2 ? 'Schedule' : 'Details'}
+                              </span>
                             </div>
-                            <span className={`text-[8px] uppercase tracking-widest font-bold ${bookingStep >= step ? 'text-brand-blue' : 'text-zinc-400'}`}>
-                              {step === 1 ? 'Route' : step === 2 ? 'Schedule' : 'Details'}
-                            </span>
-                          </div>
-                        ))}
-                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 -z-10 mx-12"></div>
+                          ))}
+                        </div>
                       </div>
                     )}
 
@@ -1237,7 +1178,9 @@ function Home() {
                               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="3" />
                               <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
                             </svg>
-                            <span className="text-[10px] font-medium text-brand-blue uppercase tracking-[0.2em]">{activeTab === 'booking' ? 'Confirming booking' : 'Sending message'}</span>
+                            <span className="text-[10px] font-medium text-brand-blue uppercase tracking-[0.2em]">
+                              {activeTab === 'booking' ? 'Submitting quote request' : 'Sending message'}
+                            </span>
                           </div>
                         </div>
                       )}
@@ -1252,28 +1195,22 @@ function Home() {
                                 exit={{ opacity: 0, x: -20 }}
                                 className="space-y-8"
                               >
-                                <div className="relative location-input-container">
-                                  <input type="text" id="fromLocation" value={formData.fromLocation} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.fromLocation ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Pickup Location *" />
-                                  {fromSuggestions.length > 0 && (
-                                    <div className="absolute top-full left-0 w-full mt-2 bg-white border border-zinc-100 rounded-xl shadow-xl z-50 max-h-48 overflow-y-auto">
-                                      {fromSuggestions.map((s, i) => (
-                                        <button key={i} type="button" onClick={() => selectSuggestion('fromLocation', s)} className="w-full text-left px-4 py-3 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0">{s}</button>
-                                      ))}
-                                    </div>
-                                  )}
-                                  {errors.fromLocation && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.fromLocation}</span>}
-                                </div>
-                                <div className="relative location-input-container">
-                                  <input type="text" id="toLocation" value={formData.toLocation} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.toLocation ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Destination *" />
-                                  {toSuggestions.length > 0 && (
-                                    <div className="absolute top-full left-0 w-full mt-2 bg-white border border-zinc-100 rounded-xl shadow-xl z-50 max-h-48 overflow-y-auto">
-                                      {toSuggestions.map((s, i) => (
-                                        <button key={i} type="button" onClick={() => selectSuggestion('toLocation', s)} className="w-full text-left px-4 py-3 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0">{s}</button>
-                                      ))}
-                                    </div>
-                                  )}
-                                  {errors.toLocation && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.toLocation}</span>}
-                                </div>
+                                <LocationAutocomplete
+                                  id="fromLocation"
+                                  variant="underline"
+                                  value={formData.fromLocation}
+                                  error={errors.fromLocation}
+                                  onChange={(v) => { setFormData(prev => ({ ...prev, fromLocation: v })); if (errors.fromLocation) setErrors(prev => ({ ...prev, fromLocation: '' })); }}
+                                  placeholder="Pickup Location *"
+                                />
+                                <LocationAutocomplete
+                                  id="toLocation"
+                                  variant="underline"
+                                  value={formData.toLocation}
+                                  error={errors.toLocation}
+                                  onChange={(v) => { setFormData(prev => ({ ...prev, toLocation: v })); if (errors.toLocation) setErrors(prev => ({ ...prev, toLocation: '' })); }}
+                                  placeholder="Destination *"
+                                />
                                 <ServiceSelect
                                   value={formData.service}
                                   error={errors.service}
@@ -1293,16 +1230,65 @@ function Home() {
                                 exit={{ opacity: 0, x: -20 }}
                                 className="space-y-8"
                               >
+                                {/* Trip Type Toggle */}
+                                <div>
+                                  <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Trip Type</span>
+                                  <div className="flex gap-2 p-1.5 bg-zinc-100/60 rounded-xl">
+                                    {[
+                                      { val: 'one-way', label: 'One Way' },
+                                      { val: 'return', label: 'Return Trip' },
+                                    ].map((opt) => (
+                                      <button
+                                        key={opt.val}
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, tripType: opt.val }))}
+                                        className={`flex-1 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${formData.tripType === opt.val ? 'bg-white text-brand-blue shadow-sm' : 'text-zinc-400 hover:text-zinc-600'}`}
+                                      >
+                                        {opt.label}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* Driver Preference Dropdown */}
+                                <div className="relative">
+                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Driver Option</span>
+                                  <select
+                                    id="driverOption"
+                                    value={formData.driverOption}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-transparent border-b border-zinc-200 py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm cursor-pointer"
+                                  >
+                                    <option value="with-driver">With Driver</option>
+                                    <option value="without-driver">Without Driver</option>
+                                  </select>
+                                </div>
+
                                 <div className="relative">
                                   <input type="date" id="pickupDate" value={formData.pickupDate} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} className={`w-full bg-transparent border-b ${errors.pickupDate ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
-                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Pickup Date *</span>
+                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{formData.tripType === 'return' ? 'Departure Date *' : 'Pickup Date *'}</span>
                                   {errors.pickupDate && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.pickupDate}</span>}
                                 </div>
                                 <div className="relative">
                                   <input type="time" id="pickupTime" value={formData.pickupTime} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.pickupTime ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
-                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Pickup Time *</span>
+                                  <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{formData.tripType === 'return' ? 'Departure Time *' : 'Pickup Time *'}</span>
                                   {errors.pickupTime && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.pickupTime}</span>}
                                 </div>
+
+                                {formData.tripType === 'return' && (
+                                  <>
+                                    <div className="relative">
+                                      <input type="date" id="returnDate" value={formData.returnDate} onChange={handleInputChange} min={formData.pickupDate || new Date().toISOString().split('T')[0]} className={`w-full bg-transparent border-b ${errors.returnDate ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
+                                      <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Return Date *</span>
+                                      {errors.returnDate && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.returnDate}</span>}
+                                    </div>
+                                    <div className="relative">
+                                      <input type="time" id="returnTime" value={formData.returnTime} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.returnTime ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
+                                      <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Return Time *</span>
+                                      {errors.returnTime && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.returnTime}</span>}
+                                    </div>
+                                  </>
+                                )}
                                 <div className="flex gap-4">
                                   <button type="button" onClick={prevStep} className="flex-1 py-4 border border-zinc-200 text-brand-blue text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-50 transition-colors">Back</button>
                                   <button type="button" onClick={nextStep} className="flex-1 py-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-orange-light transition-colors">Next Step</button>
@@ -1341,7 +1327,7 @@ function Home() {
                                     {submitStatus === 'loading' && (
                                       <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" /><path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
                                     )}
-                                    {submitStatus === 'loading' ? 'Confirming' : (formData.service && servicesAvailability[formData.service] === false ? 'Call Us' : 'Book')}
+                                    {submitStatus === 'loading' ? 'Submitting...' : (formData.service && servicesAvailability[formData.service] === false ? 'Call Us' : 'Get Quote')}
                                   </button>
                                 </div>
                               </motion.div>
@@ -1536,13 +1522,37 @@ function ServiceSelect({ value, onChange, error }: { value: string; onChange: (v
   );
 }
 
+const WA_NUMBER = '61411099994';
+const SERVICE_LABELS: Record<string, string> = {
+  chauffeur: 'Chauffeur Services',
+  accessible: 'Wheelchair Accessible Transport',
+  airport: 'Airport Transfers',
+  corporate: 'Event & Corporate Transport',
+  logistics: 'Logistics Transport',
+  disruption: 'Public Disruption Transport',
+  'vehicle-hire': 'Vehicle Hire',
+};
+
+/** Build WhatsApp URL — pre-fills message with currently-selected service if any. */
+function buildWhatsAppUrl(): string {
+  let service = '';
+  if (typeof document !== 'undefined') {
+    const sel = document.querySelector('select[name="service"]') as HTMLSelectElement | null;
+    if (sel?.value) service = SERVICE_LABELS[sel.value] || '';
+  }
+  const msg = service
+    ? `Hi, I'd like to enquire about your ${service}.`
+    : "Hi, I'd like to enquire about transport.";
+  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+}
+
 function QuickContact() {
   const phone = '0411099994';
-  const wa = '61411099994';
   return (
     <div className="hidden md:flex fixed bottom-6 left-6 z-40 flex-col gap-3">
       <a
-        href={`https://wa.me/${wa}?text=${encodeURIComponent("Hi, I'd like to enquire about transport.")}`}
+        href={`https://wa.me/${WA_NUMBER}`}
+        onClick={(e) => { e.currentTarget.href = buildWhatsAppUrl(); }}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
@@ -1568,7 +1578,6 @@ function QuickContact() {
 function StickyMobileBook() {
   const [show, setShow] = useState(false);
   const phone = '0411099994';
-  const wa = '61411099994';
   useEffect(() => {
     let raf = 0;
     const onScroll = () => {
@@ -1608,7 +1617,8 @@ function StickyMobileBook() {
             </svg>
           </a>
           <a
-            href={`https://wa.me/${wa}?text=${encodeURIComponent("Hi, I'd like to enquire about transport.")}`}
+            href={`https://wa.me/${WA_NUMBER}`}
+            onClick={(e) => { e.currentTarget.href = buildWhatsAppUrl(); }}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp"
@@ -1622,7 +1632,7 @@ function StickyMobileBook() {
             href="#contact"
             className="flex-1 h-12 bg-brand-orange hover:bg-brand-orange-light text-white rounded-full flex items-center justify-center gap-2 transition-colors"
           >
-            <span className="text-xs font-medium uppercase tracking-[0.2em]">Book Transport</span>
+            <span className="text-xs font-medium uppercase tracking-[0.2em]">Quote Now</span>
             <iconify-icon icon="solar:arrow-right-up-linear" width="16"></iconify-icon>
           </a>
         </motion.div>
@@ -1699,6 +1709,9 @@ function AcknowledgementPopup() {
 }
 
 export default function App() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
+
   return (
     <>
       <Toaster
@@ -1715,10 +1728,14 @@ export default function App() {
           },
         }}
       />
-      <ScrollToTop />
-      <QuickContact />
-      <StickyMobileBook />
-      <AcknowledgementPopup />
+      {!isAdmin && (
+        <>
+          <ScrollToTop />
+          <QuickContact />
+          <StickyMobileBook />
+          <AcknowledgementPopup />
+        </>
+      )}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services/:slug" element={<ServicePage />} />

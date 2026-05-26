@@ -1,6 +1,18 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Fix Outfit "ff" glyph overlap at bold weights — disable ligatures + kerning */
+* {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "kern" 0;
+  font-kerning: none;
+}
+
+/* Safety net — small positive tracking on headings so bold glyphs never touch */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: 0.01em;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
