@@ -12,8 +12,12 @@ interface PhotonFeature {
     name?: string;
     street?: string;
     housenumber?: string;
-    city?: string;
+    suburb?: string;
+    locality?: string;
+    neighbourhood?: string;
     district?: string;
+    city?: string;
+    county?: string;
     state?: string;
     postcode?: string;
     country?: string;
@@ -25,15 +29,23 @@ interface PhotonFeature {
 function formatFeature(f: PhotonFeature): string {
   const p = f.properties;
   const parts: string[] = [];
-  // Street address
+
+  // Street address: "8 Langridge Drive"
   const line1 = [p.housenumber, p.street].filter(Boolean).join(' ');
   if (line1) parts.push(line1);
   else if (p.name) parts.push(p.name);
-  // Locality
-  const locality = p.city || p.district;
-  if (locality && locality !== parts[0]) parts.push(locality);
-  // State
-  if (p.state) parts.push(p.state);
+
+  // Suburb — prefer most specific: suburb > locality > neighbourhood > district > city
+  // (Photon often sets city="Melbourne" for whole metro — useless for AU suburb disambiguation)
+  const suburb = p.suburb || p.locality || p.neighbourhood || p.district || p.city;
+  if (suburb && suburb !== parts[0]) parts.push(suburb);
+
+  // State + postcode for full disambiguation
+  const tail: string[] = [];
+  if (p.state) tail.push(p.state);
+  if (p.postcode) tail.push(p.postcode);
+  if (tail.length) parts.push(tail.join(' '));
+
   return parts.filter(Boolean).join(', ');
 }
 

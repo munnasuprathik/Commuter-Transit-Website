@@ -317,7 +317,7 @@ function Home() {
                   href="#contact"
                   className="bg-brand-orange hover:bg-brand-orange-light text-white px-8 py-3 text-sm font-bold tracking-widest rounded-md flex items-center gap-2 transition-colors uppercase shadow-md"
                 >
-                  QUOTE NOW
+                  BOOK NOW
                 </a>
               </div>
 
@@ -371,7 +371,7 @@ function Home() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="mt-8 mx-auto inline-flex items-center justify-center bg-brand-orange text-white px-10 py-4 rounded-md hover:bg-brand-orange-light transition-colors w-full max-w-xs"
               >
-                <span className="text-sm font-bold uppercase tracking-widest">Quote Now</span>
+                <span className="text-sm font-bold uppercase tracking-widest">Book Now</span>
               </motion.a>
             </nav>
           </motion.div>
@@ -384,7 +384,7 @@ function Home() {
         <div className="absolute inset-0 z-0">
           <motion.img 
             style={{ y: y1 }}
-            src="/images/hero-bg.png" 
+            src="/images/hero-van.jpeg" 
             alt="Commuter Transit vehicle"
             className="w-full h-full object-cover object-right-top"
           />
@@ -481,7 +481,7 @@ function Home() {
                     }}
                     className="w-full bg-brand-orange hover:bg-brand-orange-light text-white font-bold py-4 rounded-md transition-colors mt-4 text-sm tracking-widest uppercase shadow-md flex justify-center items-center gap-2"
                   >
-                    QUOTE NOW
+                    GET A QUOTE
                     <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
                   </button>
 
@@ -656,12 +656,12 @@ function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
-              { title: "Chauffeur Services", desc: "Premium point-to-point transport for executives and VIP travel.", slug: "chauffeur", icon: "lucide:car" },
-              { title: "Wheelchair Transport", desc: "Safe mobility transport with trained accessibility support.", slug: "wheelchair-accessible", icon: "tabler:wheelchair" },
-              { title: "Airport Transfers", desc: "On-time airport pickup and drop-off with luggage assistance.", slug: "airport-transfers", icon: "lucide:plane" },
-              { title: "Event & Corporate Transport", desc: "Efficient transport for events, conferences and corporate travel.", slug: "event-corporate", icon: "lucide:building-2" },
-              { title: "Logistics Transport", desc: "Flexible transport support for operational and scheduled logistics.", slug: "logistics", icon: "lucide:package" },
-              { title: "Public Disruption Transport", desc: "Rapid-response transport during service disruptions and emergencies.", slug: "rail-replacement", icon: "lucide:bus" }
+              { title: "Chauffeur Services", desc: "Premium point-to-point transport for executives and VIP travel.", slug: "chauffeur", icon: "lucide:car", image: "service-chauffeur.jpeg" },
+              { title: "Wheelchair Transport", desc: "Safe mobility transport with trained accessibility support.", slug: "wheelchair-accessible", icon: "tabler:wheelchair", image: "service-wheelchair.jpeg" },
+              { title: "Airport Transfers", desc: "On-time airport pickup and drop-off with luggage assistance.", slug: "airport-transfers", icon: "lucide:plane", image: "service-airport.jpeg" },
+              { title: "Event & Corporate Transport", desc: "Efficient transport for events, conferences and corporate travel.", slug: "event-corporate", icon: "lucide:building-2", image: "service-event.jpeg" },
+              { title: "Logistics Transport", desc: "Flexible transport support for operational and scheduled logistics.", slug: "logistics", icon: "lucide:package", image: "service-logistics.jpeg" },
+              { title: "Public Disruption Transport", desc: "Rapid-response transport during service disruptions and emergencies.", slug: "rail-replacement", icon: "lucide:bus", image: "service-public.jpeg" }
             ].map((service, idx) => (
               <motion.a
                 key={idx}
@@ -670,16 +670,21 @@ function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group flex flex-col p-8 md:p-10 bg-[#fafafa] hover:bg-white rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 border border-transparent hover:border-gray-100"
+                className="group flex flex-col bg-[#fafafa] hover:bg-white rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 border border-transparent hover:border-gray-100 overflow-hidden"
               >
-                <div className="w-14 h-14 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange mb-8 transition-transform duration-500 group-hover:-translate-y-1">
-                  <iconify-icon icon={service.icon} width="28"></iconify-icon>
+                <div className="w-full h-48 md:h-56 relative overflow-hidden">
+                  <img src={`/images/${service.image}`} alt={service.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-brand-orange shadow-lg">
+                    <iconify-icon icon={service.icon} width="24"></iconify-icon>
+                  </div>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold text-[#050B14] mb-3">{service.title}</h3>
-                <p className="text-sm md:text-base text-gray-500 font-light leading-relaxed mb-8 flex-grow">{service.desc}</p>
-                <div className="flex items-center gap-2 text-brand-orange font-bold text-xs uppercase tracking-widest mt-auto group-hover:gap-3 transition-all duration-300">
-                  LEARN MORE
-                  <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
+                <div className="p-8 md:p-10 flex flex-col flex-grow">
+                  <h3 className="text-xl md:text-2xl font-bold text-[#050B14] mb-3">{service.title}</h3>
+                  <p className="text-sm md:text-base text-gray-500 font-light leading-relaxed mb-8 flex-grow">{service.desc}</p>
+                  <div className="flex items-center gap-2 text-brand-orange font-bold text-xs uppercase tracking-widest mt-auto group-hover:gap-3 transition-all duration-300">
+                    LEARN MORE
+                    <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
+                  </div>
                 </div>
               </motion.a>
             ))}
@@ -697,7 +702,7 @@ function Home() {
               viewport={{ once: true }}
               className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em] block mb-4"
             >
-              QUOTE PROCESS
+              BOOKING PROCESS
             </motion.span>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -706,7 +711,7 @@ function Home() {
               transition={{ delay: 0.1 }}
               className="text-3xl sm:text-4xl md:text-5xl text-brand-blue font-bold tracking-tight"
             >
-              Requesting a Quote Made Simple in <span className="italic text-brand-orange font-medium">Under 2 Minutes</span>
+              Booking Made Simple in <span className="italic text-brand-orange font-medium">Under 2 Minutes</span>
             </motion.h2>
           </div>
 
@@ -1584,7 +1589,7 @@ function StickyMobileBook() {
             href="#contact"
             className="flex-1 h-12 bg-brand-orange hover:bg-brand-orange-light text-white rounded-full flex items-center justify-center gap-2 transition-colors"
           >
-            <span className="text-xs font-medium uppercase tracking-[0.2em]">Quote Now</span>
+            <span className="text-xs font-medium uppercase tracking-[0.2em]">Book Now</span>
             <iconify-icon icon="solar:arrow-right-up-linear" width="16"></iconify-icon>
           </a>
         </motion.div>
