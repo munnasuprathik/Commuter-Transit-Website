@@ -3,9 +3,6 @@
 
 // Australia bounding box: minLon, minLat, maxLon, maxLat
 const AU_BBOX = '112.0,-44.0,154.0,-9.0';
-// Bias results toward south-east AU (Melbourne) where most demand is
-const AU_LAT = -37.8136;
-const AU_LON = 144.9631;
 
 interface PhotonFeature {
   properties: {
@@ -55,7 +52,7 @@ export async function fetchSuggestions(input: string): Promise<string[]> {
   try {
     const url =
       `https://photon.komoot.io/api/?q=${encodeURIComponent(input)}` +
-      `&limit=8&lang=en&bbox=${AU_BBOX}&lat=${AU_LAT}&lon=${AU_LON}`;
+      `&limit=8&lang=en&bbox=${AU_BBOX}`;
     const res = await fetch(url);
     if (!res.ok) return [];
     const data = await res.json();
