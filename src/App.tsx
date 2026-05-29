@@ -15,6 +15,7 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { NotFound } from './pages/NotFound';
 import { ServicePage } from './pages/services/ServicePage';
 import { Toaster, toast } from 'sonner';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 import { Typewriter } from './components/ui/typewriter';
 import { MagneticButton } from './components/ui/magnetic-button';
@@ -1671,6 +1672,7 @@ export default function App() {
 
   return (
     <>
+      <SpeedInsights />
       <Toaster
         position="top-right"
         theme="dark"
@@ -1704,5 +1706,3 @@ export default function App() {
     </>
   );
 }
-
-
