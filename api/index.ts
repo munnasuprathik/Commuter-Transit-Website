@@ -51,6 +51,22 @@ function checkRateLimit(ip: string): { allowed: boolean; retryAfterMin?: number 
   return { allowed: true };
 }
 
+function getClientIp(req: express.Request): string {
+  return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+}
+
+// Hardening headers for admin endpoints
+const adminHeaders = (_req: express.Request, res: express.Response, next: express.NextFunction) => {
+  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Permissions-Policy", "geolocation=(), camera=(), microphone=()");
+  next();
+};
+app.use("/api/admin", adminHeaders);
+
 // Lazy NeonDB Connection
 let sqlClient: any = null;
 const getSql = () => {
@@ -246,7 +262,7 @@ const isAdmin = (req: express.Request, res: express.Response, next: express.Next
 };
 
 app.post("/api/admin/login", (req, res) => {
-  const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+  const ip = getClientIp(req);
   const { password } = req.body;
   const adminSecret = process.env.ADMIN_SECRET;
   if (!adminSecret) return res.status(500).json({ error: "ADMIN_SECRET not configured." });

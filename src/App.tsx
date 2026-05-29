@@ -1666,7 +1666,8 @@ function AcknowledgementPopup() {
 
 export default function App() {
   const location = useLocation();
-  const isAdmin = location.pathname.startsWith('/admin');
+  const ADMIN_PATH = (import.meta.env.VITE_ADMIN_PATH || 'admin').replace(/^\/+/, '');
+  const isAdmin = location.pathname.startsWith(`/${ADMIN_PATH}`);
 
   return (
     <>
@@ -1697,7 +1698,7 @@ export default function App() {
         <Route path="/services/:slug" element={<ServicePage />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path={`/${ADMIN_PATH}`} element={<AdminDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

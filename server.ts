@@ -59,6 +59,10 @@ function clearAttempts(ip: string) {
   loginAttempts.delete(ip);
 }
 
+function getClientIp(req: express.Request): string {
+  return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+}
+
 console.log("Starting server.ts execution...");
 dotenv.config();
 
@@ -354,6 +358,18 @@ async function startServer() {
   });
 
   // Admin API Routes
+  // Hardening headers for all admin endpoints
+  const adminHeaders = (_req: express.Request, res: express.Response, next: express.NextFunction) => {
+    res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    res.setHeader("Referrer-Policy", "no-referrer");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Permissions-Policy", "geolocation=(), camera=(), microphone=()");
+    next();
+  };
+  app.use("/api/admin", adminHeaders);
+
   const isAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const adminSecret = process.env.ADMIN_SECRET;
     if (!adminSecret) {
@@ -368,7 +384,7 @@ async function startServer() {
   };
 
   app.post("/api/admin/login", (req, res) => {
-    const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+    const ip = getClientIp(req);
     const { password } = req.body;
     const adminSecret = process.env.ADMIN_SECRET;
     if (!adminSecret) {

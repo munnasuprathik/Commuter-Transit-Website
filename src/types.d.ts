@@ -3,6 +3,7 @@ import * as React from 'react';
 
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_MAPS_API_KEY?: string;
+  readonly VITE_ADMIN_PATH?: string;
 }
 interface ImportMeta {
   readonly env: ImportMetaEnv;
