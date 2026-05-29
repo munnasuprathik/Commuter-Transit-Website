@@ -382,10 +382,10 @@ function Home() {
       <section id="hero" data-header-theme="dark" className="relative min-h-[90svh] flex items-center bg-brand-blue pt-32 pb-16 md:pt-40 md:pb-32">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <motion.img 
+          <motion.img
             style={{ y: y1 }}
-            src="/images/hero-van.jpeg" 
-            alt="Commuter Transit vehicle"
+            src="/images/hero-van.jpeg"
+            alt="Commuter Transit specialist transport vehicle on Australian road — chauffeur, accessible and corporate transport across Melbourne and Victoria"
             className="w-full h-full object-cover object-right-top"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#050B14] via-[#050B14]/90 via-35% to-transparent"></div>
@@ -673,7 +673,7 @@ function Home() {
                 className="group flex flex-col bg-[#fafafa] hover:bg-white rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 border border-transparent hover:border-gray-100 overflow-hidden"
               >
                 <div className="w-full h-48 md:h-56 relative overflow-hidden">
-                  <img src={`/images/${service.image}`} alt={service.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img src={`/images/${service.image}`} alt={`${service.title} — ${service.desc.substring(0, 100)}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
                   <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-brand-orange shadow-lg">
                     <iconify-icon icon={service.icon} width="24"></iconify-icon>
                   </div>

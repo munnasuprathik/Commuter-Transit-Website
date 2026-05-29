@@ -36,6 +36,10 @@ function injectHead(service: ServiceContent) {
   }
   canonical.setAttribute('href', `${SITE}/services/${service.slug}`);
 
+  // OG image — use logo for consistent share preview (WhatsApp/Facebook/LinkedIn/Twitter)
+  setMeta('og:image', `${SITE}/images/CT%20LOGO.png`, 'property');
+  setMeta('twitter:image', `${SITE}/images/CT%20LOGO.png`, 'property');
+
   // Service JSON-LD
   const existing = document.getElementById('jsonld-service');
   if (existing) existing.remove();
@@ -65,6 +69,23 @@ function injectHead(service: ServiceContent) {
     url: `${SITE}/services/${service.slug}`,
   });
   document.head.appendChild(script);
+
+  // BreadcrumbList JSON-LD (Home > Services > <service>)
+  const breadcrumbExisting = document.getElementById('jsonld-breadcrumb');
+  if (breadcrumbExisting) breadcrumbExisting.remove();
+  const breadcrumb = document.createElement('script');
+  breadcrumb.type = 'application/ld+json';
+  breadcrumb.id = 'jsonld-breadcrumb';
+  breadcrumb.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE },
+      { '@type': 'ListItem', position: 2, name: 'Services', item: `${SITE}/#services` },
+      { '@type': 'ListItem', position: 3, name: service.headline, item: `${SITE}/services/${service.slug}` },
+    ],
+  });
+  document.head.appendChild(breadcrumb);
 }
 
 export function ServicePage() {
@@ -76,8 +97,8 @@ export function ServicePage() {
     injectHead(service);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     return () => {
-      const s = document.getElementById('jsonld-service');
-      if (s) s.remove();
+      document.getElementById('jsonld-service')?.remove();
+      document.getElementById('jsonld-breadcrumb')?.remove();
     };
   }, [service]);
 
@@ -152,7 +173,7 @@ export function ServicePage() {
               transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-5 relative h-[280px] md:h-[400px] lg:h-[480px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl"
             >
-              <img src={service.image} alt={service.headline} className="w-full h-full object-cover" loading="eager" />
+              <img src={service.image} alt={`${service.headline} — ${service.hero}`} className="w-full h-full object-cover" loading="eager" />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-blue/40 to-transparent"></div>
             </motion.div>
           </div>
