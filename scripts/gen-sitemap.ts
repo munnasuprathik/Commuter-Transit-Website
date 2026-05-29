@@ -7,12 +7,6 @@ type Entry = { loc: string; changefreq: string; priority: string };
 
 const routes: Entry[] = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
-  { loc: '/#services', changefreq: 'weekly', priority: '0.9' },
-  { loc: '/#fleet', changefreq: 'monthly', priority: '0.7' },
-  { loc: '/#corporate', changefreq: 'monthly', priority: '0.8' },
-  { loc: '/#standards', changefreq: 'monthly', priority: '0.7' },
-  { loc: '/#why-us', changefreq: 'monthly', priority: '0.7' },
-  { loc: '/#contact', changefreq: 'weekly', priority: '0.9' },
   { loc: '/services/chauffeur', changefreq: 'monthly', priority: '0.9' },
   { loc: '/services/wheelchair-accessible', changefreq: 'monthly', priority: '0.9' },
   { loc: '/services/airport-transfers', changefreq: 'monthly', priority: '0.9' },
