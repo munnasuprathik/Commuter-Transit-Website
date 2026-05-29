@@ -20,6 +20,7 @@ import { Typewriter } from './components/ui/typewriter';
 import { MagneticButton } from './components/ui/magnetic-button';
 import { TextReveal } from './components/ui/text-reveal';
 import { LocationAutocomplete } from './components/ui/location-autocomplete';
+import { Analytics } from '@vercel/analytics/react';
 
 function Home() {
   const COMPANY_PHONE = '0411 099 994'; // Updated company phone number
@@ -1701,8 +1702,7 @@ export default function App() {
         <Route path={`/${ADMIN_PATH}`} element={<AdminDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Analytics />
     </>
   );
 }
-
-
