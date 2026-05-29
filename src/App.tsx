@@ -715,14 +715,13 @@ function Home() {
             </motion.h2>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8 relative">
+          <div className="grid md:grid-cols-3 gap-8 relative">
             <div className="hidden md:block absolute top-[45px] left-[12%] right-[12%] h-[2px] bg-gray-200 z-0"></div>
 
             {[
               { step: "01", title: "Choose Service", desc: "Select the transport service that suits your needs." },
               { step: "02", title: "Share Details", desc: "Provide pickup, destination, time and requirements." },
-              { step: "03", title: "Get Your Quote", desc: "We confirm availability and provide a clear, transparent quote." },
-              { step: "04", title: "Ride Confirmed", desc: "Your ride is confirmed and a professional driver is dispatched." }
+              { step: "03", title: "Get Your Quote", desc: "We confirm availability and provide a clear, transparent quote." }
             ].map((s, i) => (
               <motion.div
                 key={i}

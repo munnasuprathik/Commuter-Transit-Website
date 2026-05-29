@@ -33,7 +33,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Punctuality Guarantee', desc: 'On-time, every time — for business meetings, weddings, VIP transfers.', icon: 'solar:clock-circle-linear' },
     ],
     image:
-      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1600&auto=format&fit=crop',
+      '/images/service-chauffeur.jpeg',
   },
   'wheelchair-accessible': {
     slug: 'wheelchair-accessible',
@@ -57,7 +57,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Dignity-First', desc: 'Trained drivers, inclusive support, respectful service on every journey.', icon: 'solar:shield-user-linear' },
     ],
     image:
-      'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?q=80&w=1600&auto=format&fit=crop',
+      '/images/service-wheelchair.jpeg',
   },
   'airport-transfers': {
     slug: 'airport-transfers',
@@ -81,7 +81,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Meet & Greet', desc: 'Driver waits at arrivals with name board, helps with luggage.', icon: 'solar:user-check-linear' },
     ],
     image:
-      'https://images.unsplash.com/photo-1556122071-e404eaedb77f?q=80&w=1600&auto=format&fit=crop',
+      '/images/service-airport.jpeg',
   },
   'event-corporate': {
     slug: 'event-corporate',
@@ -105,7 +105,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Account-Managed', desc: 'Dedicated account manager for recurring corporate bookings.', icon: 'solar:case-linear' },
     ],
     image:
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1600&auto=format&fit=crop',
+      '/images/service-event.jpeg',
   },
   logistics: {
     slug: 'logistics',
@@ -122,7 +122,7 @@ export const SERVICES: Record<string, ServiceContent> = {
     ],
     highlights: [],
     image:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop',
+      '/images/service-logistics.jpeg',
   },
   'rail-replacement': {
     slug: 'rail-replacement',
@@ -147,7 +147,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Trained Operators', desc: 'Drivers and coordinators experienced in public transport workflows.', icon: 'solar:tram-linear' },
     ],
     image:
-      'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=1600&auto=format&fit=crop',
+      '/images/service-public.jpeg',
   },
   'vehicle-hire': {
     slug: 'vehicle-hire',
@@ -171,7 +171,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Driver Optional', desc: 'Chauffeur-driven or self-drive — flexible to your needs.', icon: 'solar:user-id-linear' },
     ],
     image:
-      'https://images.unsplash.com/photo-1581094751227-43b4852bb2f7?q=80&w=1600&auto=format&fit=crop',
+      '/images/hero-van.jpeg',
   },
 };
 
