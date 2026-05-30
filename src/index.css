@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Prevent horizontal scroll on mobile while keeping vertical scroll smooth */
+html {
+  overflow-x: clip;
+}
+body {
+  overflow-x: clip;
+  width: 100%;
+}
+
 /* Fix Outfit "ff" glyph overlap at bold weights — disable ligatures + kerning */
 * {
   font-variant-ligatures: none;
