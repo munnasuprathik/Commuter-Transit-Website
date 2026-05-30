@@ -198,9 +198,12 @@ export function AdminDashboard() {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Password</label>
+              <label htmlFor="admin-pwd" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Password</label>
               <input
+                id="admin-pwd"
                 type="password"
+                autoComplete="current-password"
+                aria-label="Admin password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-brand-blue focus:border-brand-blue outline-none transition-colors"

@@ -1236,6 +1236,7 @@ function Home() {
                                   <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Driver Option</span>
                                   <select
                                     id="driverOption"
+                                    aria-label="Driver option"
                                     value={formData.driverOption}
                                     onChange={handleInputChange}
                                     className="w-full bg-transparent border-b border-zinc-200 py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm cursor-pointer"
@@ -1246,12 +1247,12 @@ function Home() {
                                 </div>
 
                                 <div className="relative">
-                                  <input type="date" id="pickupDate" value={formData.pickupDate} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} className={`w-full bg-transparent border-b ${errors.pickupDate ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
+                                  <input type="date" id="pickupDate" aria-label="Pickup date" value={formData.pickupDate} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} className={`w-full bg-transparent border-b ${errors.pickupDate ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
                                   <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Pickup Date *</span>
                                   {errors.pickupDate && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.pickupDate}</span>}
                                 </div>
                                 <div className="relative">
-                                  <input type="time" id="pickupTime" value={formData.pickupTime} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.pickupTime ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
+                                  <input type="time" id="pickupTime" aria-label="Pickup time" value={formData.pickupTime} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.pickupTime ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue focus:border-brand-blue outline-none transition-colors text-sm`} />
                                   <span className="absolute -top-4 left-0 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Pickup Time *</span>
                                   {errors.pickupTime && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.pickupTime}</span>}
                                 </div>
@@ -1273,20 +1274,20 @@ function Home() {
                               >
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-6">
                                   <div className="relative">
-                                    <input type="text" id="fullName" value={formData.fullName} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.fullName ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Full Name *" />
+                                    <input type="text" id="fullName" aria-label="Full name" autoComplete="name" value={formData.fullName} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.fullName ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Full Name *" />
                                     {errors.fullName && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.fullName}</span>}
                                   </div>
                                   <div className="relative">
-                                    <input type="tel" id="phone" value={formData.phone} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.phone ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Phone *" />
+                                    <input type="tel" id="phone" aria-label="Phone number" autoComplete="tel" value={formData.phone} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.phone ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Phone *" />
                                     {errors.phone && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.phone}</span>}
                                   </div>
                                 </div>
                                 <div className="relative">
-                                  <input type="email" id="email" value={formData.email} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.email ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Email Address *" />
+                                  <input type="email" id="email" aria-label="Email address" autoComplete="email" value={formData.email} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.email ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Email Address *" />
                                   {errors.email && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.email}</span>}
                                 </div>
                                 <div className="relative">
-                                  <textarea id="message" value={formData.message} onChange={handleInputChange} rows={2} className="w-full bg-transparent border-b border-zinc-200 py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm resize-none" placeholder="Special Requirements (Optional)"></textarea>
+                                  <textarea id="message" aria-label="Special requirements" value={formData.message} onChange={handleInputChange} rows={2} className="w-full bg-transparent border-b border-zinc-200 py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm resize-none" placeholder="Special Requirements (Optional)"></textarea>
                                 </div>
                                 <div className="flex gap-4">
                                   <button type="button" onClick={prevStep} className="flex-1 py-4 border border-zinc-200 text-brand-blue text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-50 transition-colors">Back</button>
@@ -1308,15 +1309,15 @@ function Home() {
                             className="space-y-8"
                           >
                             <div className="relative">
-                              <input type="text" id="fullName" value={formData.fullName} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.fullName ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Full Name *" />
+                              <input type="text" id="fullName" aria-label="Full name" autoComplete="name" value={formData.fullName} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.fullName ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Full Name *" />
                               {errors.fullName && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.fullName}</span>}
                             </div>
                             <div className="relative">
-                              <input type="email" id="email" value={formData.email} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.email ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Email Address *" />
+                              <input type="email" id="email" aria-label="Email address" autoComplete="email" value={formData.email} onChange={handleInputChange} className={`w-full bg-transparent border-b ${errors.email ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm`} placeholder="Email Address *" />
                               {errors.email && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.email}</span>}
                             </div>
                             <div className="relative">
-                              <textarea id="message" value={formData.message} onChange={handleInputChange} rows={4} className={`w-full bg-transparent border-b ${errors.message ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm resize-none`} placeholder="How can we help you? *"></textarea>
+                              <textarea id="message" aria-label="Your message" value={formData.message} onChange={handleInputChange} rows={4} className={`w-full bg-transparent border-b ${errors.message ? 'border-red-300' : 'border-zinc-200'} py-4 text-brand-blue placeholder:text-zinc-400 focus:border-brand-blue outline-none transition-colors text-sm resize-none`} placeholder="How can we help you? *"></textarea>
                               {errors.message && <span className="absolute -bottom-5 left-0 text-[10px] text-red-500">{errors.message}</span>}
                             </div>
                             <button type="submit" disabled={submitStatus === 'loading'} className="w-full py-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-orange-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
@@ -1572,7 +1573,8 @@ function StickyMobileBook() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-brand-blue border-t border-white/10 px-3 py-3 flex items-center gap-2 shadow-[0_-8px_30px_-10px_rgba(0,0,0,0.4)]"
+          className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-brand-blue border-t border-white/10 px-3 pt-3 flex items-center gap-2 shadow-[0_-8px_30px_-10px_rgba(0,0,0,0.4)]"
+          style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
         >
           <a
             href={`tel:${phone}`}

@@ -10,6 +10,13 @@ body {
   width: 100%;
 }
 
+/* Reserve space at page bottom on mobile so sticky CTA bar doesn't cover content */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 /* Fix Outfit "ff" glyph overlap at bold weights — disable ligatures + kerning */
 * {
   font-variant-ligatures: none;
