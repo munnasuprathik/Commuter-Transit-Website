@@ -112,7 +112,7 @@ export function ServicePage() {
       <header className="absolute top-0 inset-x-0 z-50 px-4 md:px-8 py-4 md:py-6 flex justify-between items-center pointer-events-none">
         <Link to="/" className="pointer-events-auto inline-flex items-center">
           <div className="h-24 md:h-28">
-            <img src="/images/CT LOGO WHITE.png" alt="Commuter Transit" className="h-full w-auto object-contain" />
+            <img src="/images/CT LOGO WHITE.webp" alt="Commuter Transit" className="h-full w-auto object-contain" />
           </div>
         </Link>
         <Link

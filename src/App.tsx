@@ -285,8 +285,11 @@ function Home() {
               {/* Logo */}
               <a href="/" className="flex-shrink-0 flex items-center h-full">
                 <img
-                  src="/images/CT LOGO WHITE.png"
+                  src="/images/CT LOGO WHITE.webp"
                   alt="Commuter Transit Logo"
+                  width="168"
+                  height="168"
+                  fetchPriority="high"
                   className="h-24 md:h-28 w-auto object-contain transition-all duration-300"
                 />
               </a>
@@ -324,6 +327,8 @@ function Home() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isMobileMenuOpen}
                 className="lg:hidden text-white hover:text-brand-orange transition-colors"
               >
                 <iconify-icon icon={isMobileMenuOpen ? "solar:close-circle-linear" : "solar:hamburger-menu-linear"} width="32"></iconify-icon>
@@ -384,8 +389,12 @@ function Home() {
         <div className="absolute inset-0 z-0">
           <motion.img
             style={{ y: y1 }}
-            src="/images/hero-van.jpeg"
+            src="/images/hero-van.webp"
             alt="Commuter Transit specialist transport vehicle on Australian road — chauffeur, accessible and corporate transport across Melbourne and Victoria"
+            width="1920"
+            height="1080"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover object-right-top"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#050B14] via-[#050B14]/90 via-35% to-transparent"></div>
@@ -420,7 +429,7 @@ function Home() {
             <div className="lg:col-span-5 flex justify-center lg:justify-end mt-8 lg:mt-0">
               <div className="bg-white rounded-xl p-8 md:p-10 shadow-2xl w-full max-w-md relative overflow-hidden">
                 <div className="text-center mb-6 relative z-10">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">Get an Instant Quote</h3>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">Get an Instant Quote</h2>
                   <p className="text-gray-500 text-sm">Quick. Easy. No Obligation.</p>
                 </div>
 
@@ -446,10 +455,12 @@ function Home() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide">Service Type</label>
+                    <label htmlFor="hero-service" className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide">Service Type</label>
                     <div className="relative">
                       <select
+                        id="hero-service"
                         name="service"
+                        aria-label="Service Type"
                         value={formData.service}
                         onChange={handleInputChange}
                         className="w-full bg-white border border-gray-300 rounded-md px-4 py-3.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent appearance-none text-sm"
@@ -656,12 +667,12 @@ function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
-              { title: "Chauffeur Services", desc: "Premium point-to-point transport for executives and VIP travel.", slug: "chauffeur", icon: "lucide:car", image: "service-chauffeur.jpeg" },
-              { title: "Wheelchair Transport", desc: "Safe mobility transport with trained accessibility support.", slug: "wheelchair-accessible", icon: "tabler:wheelchair", image: "service-wheelchair.jpeg" },
-              { title: "Airport Transfers", desc: "On-time airport pickup and drop-off with luggage assistance.", slug: "airport-transfers", icon: "lucide:plane", image: "service-airport.jpeg" },
-              { title: "Event & Corporate Transport", desc: "Efficient transport for events, conferences and corporate travel.", slug: "event-corporate", icon: "lucide:building-2", image: "service-event.jpeg" },
-              { title: "Logistics Transport", desc: "Flexible transport support for operational and scheduled logistics.", slug: "logistics", icon: "lucide:package", image: "service-logistics.jpeg" },
-              { title: "Public Disruption Transport", desc: "Rapid-response transport during service disruptions and emergencies.", slug: "rail-replacement", icon: "lucide:bus", image: "service-public.jpeg" }
+              { title: "Chauffeur Services", desc: "Premium point-to-point transport for executives and VIP travel.", slug: "chauffeur", icon: "lucide:car", image: "service-chauffeur.webp" },
+              { title: "Wheelchair Transport", desc: "Safe mobility transport with trained accessibility support.", slug: "wheelchair-accessible", icon: "tabler:wheelchair", image: "service-wheelchair.webp" },
+              { title: "Airport Transfers", desc: "On-time airport pickup and drop-off with luggage assistance.", slug: "airport-transfers", icon: "lucide:plane", image: "service-airport.webp" },
+              { title: "Event & Corporate Transport", desc: "Efficient transport for events, conferences and corporate travel.", slug: "event-corporate", icon: "lucide:building-2", image: "service-event.webp" },
+              { title: "Logistics Transport", desc: "Flexible transport support for operational and scheduled logistics.", slug: "logistics", icon: "lucide:package", image: "service-logistics.webp" },
+              { title: "Public Disruption Transport", desc: "Rapid-response transport during service disruptions and emergencies.", slug: "rail-replacement", icon: "lucide:bus", image: "service-public.webp" }
             ].map((service, idx) => (
               <motion.a
                 key={idx}
@@ -673,7 +684,7 @@ function Home() {
                 className="group flex flex-col bg-[#fafafa] hover:bg-white rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 border border-transparent hover:border-gray-100 overflow-hidden"
               >
                 <div className="w-full h-48 md:h-56 relative overflow-hidden">
-                  <img src={`/images/${service.image}`} alt={`${service.title} — ${service.desc.substring(0, 100)}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                  <img src={`/images/${service.image}`} alt={`${service.title} — ${service.desc.substring(0, 100)}`} width="634" height="423" loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-brand-orange shadow-lg">
                     <iconify-icon icon={service.icon} width="24"></iconify-icon>
                   </div>
@@ -1330,7 +1341,7 @@ function Home() {
       <section className="py-16 md:py-24 bg-[#fafafa] border-t border-gray-100 relative">
         <div className="container mx-auto px-6 max-w-3xl">
           <div className="text-center mb-12 md:mb-16">
-            <span className="text-[10px] sm:text-xs font-bold text-brand-orange uppercase tracking-[0.3em] block mb-4">FAQ</span>
+            <span className="text-[10px] sm:text-xs font-bold text-[#B84800] uppercase tracking-[0.3em] block mb-4">FAQ</span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl text-brand-blue font-bold tracking-tight">
               Frequently Asked Questions
             </h2>
@@ -1602,8 +1613,16 @@ function AcknowledgementPopup() {
 
   useEffect(() => {
     if (sessionStorage.getItem('ct_aok_dismissed')) return;
-    const t = window.setTimeout(() => setIsOpen(true), 1200);
-    return () => window.clearTimeout(t);
+    // Defer popup until after page has rendered (avoid blocking LCP)
+    const idleCb = (window as any).requestIdleCallback || ((cb: () => void) => window.setTimeout(cb, 1));
+    let timeoutId: number | undefined;
+    const idleHandle = idleCb(() => {
+      timeoutId = window.setTimeout(() => setIsOpen(true), 3000);
+    });
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+      if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(idleHandle);
+    };
   }, []);
 
   useEffect(() => {
@@ -1653,8 +1672,12 @@ function AcknowledgementPopup() {
               <iconify-icon icon="solar:close-circle-linear" width="22"></iconify-icon>
             </button>
             <img
-              src="/images/pop-up.jpeg"
+              src="/images/pop-up.webp"
               alt="Acknowledgement of Country — We acknowledge Aboriginal and Torres Strait Islander peoples as the Traditional Custodians of the land on which we operate, and we pay respect to their Elders past, present and emerging."
+              width="1536"
+              height="1024"
+              loading="lazy"
+              decoding="async"
               className="block w-full h-auto"
             />
           </motion.div>

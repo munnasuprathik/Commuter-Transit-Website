@@ -191,7 +191,7 @@ export function AdminDashboard() {
         >
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-brand-blue flex items-center justify-center rounded-full p-2">
-              <img src="/images/CT LOGO WHITE.png" alt="Commuter Transit" className="w-full h-full object-contain" />
+              <img src="/images/CT LOGO WHITE.webp" alt="Commuter Transit" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-xl font-medium text-brand-blue tracking-tight">Admin Access</h1>
           </div>
@@ -227,7 +227,7 @@ export function AdminDashboard() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div className="flex items-center gap-4">
             <div className="h-12 md:h-14 flex items-center">
-              <img src="/images/CT LOGO.png" alt="Commuter Transit" className="h-full w-auto object-contain" />
+              <img src="/images/CT LOGO.webp" alt="Commuter Transit" className="h-full w-auto object-contain" />
             </div>
             <div className="border-l border-zinc-300 pl-4">
               <h1 className="text-2xl font-medium tracking-tight text-brand-blue">Admin Dashboard</h1>

@@ -39,7 +39,7 @@ export function Footer() {
             className="md:col-span-5"
           >
             <div className="h-20 sm:h-24 md:h-28 lg:h-32 mb-6">
-              <img src="/images/CT LOGO WHITE.png" alt="Commuter Transit — Specialist transport & mobility solutions across Victoria" className="h-full w-auto object-contain object-left scale-[1.35] origin-left" />
+              <img src="/images/CT LOGO WHITE.webp" alt="Commuter Transit — Specialist transport & mobility solutions across Victoria" width="200" height="200" loading="lazy" decoding="async" className="h-full w-auto object-contain object-left scale-[1.35] origin-left" />
             </div>
             <p className="text-white/70 font-light text-sm max-w-sm leading-relaxed mb-8">
               Safe, accessible and reliable transport solutions across Victoria, available 24/7.

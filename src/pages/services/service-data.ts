@@ -33,7 +33,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Punctuality Guarantee', desc: 'On-time, every time — for business meetings, weddings, VIP transfers.', icon: 'solar:clock-circle-linear' },
     ],
     image:
-      '/images/service-chauffeur.jpeg',
+      '/images/service-chauffeur.webp',
   },
   'wheelchair-accessible': {
     slug: 'wheelchair-accessible',
@@ -57,7 +57,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Dignity-First', desc: 'Trained drivers, inclusive support, respectful service on every journey.', icon: 'solar:shield-user-linear' },
     ],
     image:
-      '/images/service-wheelchair.jpeg',
+      '/images/service-wheelchair.webp',
   },
   'airport-transfers': {
     slug: 'airport-transfers',
@@ -81,7 +81,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Meet & Greet', desc: 'Driver waits at arrivals with name board, helps with luggage.', icon: 'solar:user-check-linear' },
     ],
     image:
-      '/images/service-airport.jpeg',
+      '/images/service-airport.webp',
   },
   'event-corporate': {
     slug: 'event-corporate',
@@ -105,7 +105,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Account-Managed', desc: 'Dedicated account manager for recurring corporate bookings.', icon: 'solar:case-linear' },
     ],
     image:
-      '/images/service-event.jpeg',
+      '/images/service-event.webp',
   },
   logistics: {
     slug: 'logistics',
@@ -122,7 +122,7 @@ export const SERVICES: Record<string, ServiceContent> = {
     ],
     highlights: [],
     image:
-      '/images/service-logistics.jpeg',
+      '/images/service-logistics.webp',
   },
   'rail-replacement': {
     slug: 'rail-replacement',
@@ -147,7 +147,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Trained Operators', desc: 'Drivers and coordinators experienced in public transport workflows.', icon: 'solar:tram-linear' },
     ],
     image:
-      '/images/service-public.jpeg',
+      '/images/service-public.webp',
   },
   'vehicle-hire': {
     slug: 'vehicle-hire',
@@ -171,7 +171,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Driver Optional', desc: 'Chauffeur-driven or self-drive — flexible to your needs.', icon: 'solar:user-id-linear' },
     ],
     image:
-      '/images/hero-van.jpeg',
+      '/images/hero-van.webp',
   },
 };
 
